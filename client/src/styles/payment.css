@@ -1,0 +1,24 @@
+.payment-container {
+  padding: 30px;
+}
+
+.payment-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.payment-table th,
+.payment-table td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+}
+
+.status.completed {
+  color: green;
+  font-weight: bold;
+}
+
+.status.pending {
+  color: orange;
+}
