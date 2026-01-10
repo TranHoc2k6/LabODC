@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
 import "../styles/admin.css";
-import { useNavigate } from "react-router-dom";
 
 export default function AdminProjects() {
   const [projects, setProjects] = useState<any[]>([]);
   const [openProjectId, setOpenProjectId] = useState<number | null>(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     api.get("/projects/admin/projects")
@@ -14,44 +12,40 @@ export default function AdminProjects() {
       .catch(err => console.error(err));
   }, []);
 
+  const getStatus = (p: any) => {
+    // ưu tiên backend trả
+    if (p.status) return p.status;
+
+    // fallback nếu chưa có
+    if (!p.members || p.members.length === 0) return "DRAFT";
+    return "RUNNING";
+  };
+  
+
   return (
-    <div className="admin-layout">
-      {/* SIDEBAR */}
-      <aside className="sidebar">
-        <h2>LabODC</h2>
-        <ul>
-          <li className="active" onClick={() => navigate("/admin/projects")}>
-            Projects
-          </li>
+    <>
+      <header className="header">
+        <h1>📁 Admin – Projects</h1>
+      </header>
 
-          <li onClick={() => navigate("/admin/users")}>
-            Users
-          </li>
+      <div className="projects-grid">
+        {projects.map((p) => {
+          const status = getStatus(p).toLowerCase();
 
-          <li onClick={() => navigate("/admin/payments")}>
-            Payments
-          </li>
-        </ul>
-      </aside>
-
-      {/* MAIN */}
-      <main className="main">
-        <header className="header">
-          <h1>Admin – Projects</h1>
-        </header>
-
-        <div className="projects-grid">
-          {projects.map((p) => (
+          return (
             <div className="project-card" key={p.project_id}>
+              {/* PROJECT STATUS */}
+              <span className={`badge project-status ${status}`}>
+                {status.toUpperCase()}
+              </span>
+
               <h3>{p.title}</h3>
+              <p className="project-desc">{p.description}</p>
 
-              <p>{p.description}</p>
-
-              <span>
+              <span className="project-meta">
                 Members: <b>{p.members?.length || 0}</b>
               </span>
 
-              {/* BUTTON XEM CHI TIẾT */}
               <button
                 className="btn-view"
                 onClick={() =>
@@ -65,16 +59,28 @@ export default function AdminProjects() {
                   : "View Members"}
               </button>
 
-              {/* DANH SÁCH MEMBER */}
+              {/* MEMBERS */}
               {openProjectId === p.project_id && (
                 <div className="member-box">
                   {(!p.members || p.members.length === 0) ? (
-                    <p>No members yet</p>
+                    <p className="empty">No members yet</p>
                   ) : (
                     <ul>
                       {p.members.map((m: any) => (
-                        <li key={m.user_id}>
-                          👤 <b>User #{m.user_id}</b> — {m.role} — {m.status}
+                        <li key={m.user_id} className="member-item">
+                          <div>
+                            👤 <b>User #{m.user_id}</b>
+                          </div>
+
+                          <div className="member-badges">
+                            <span className={`badge role ${m.role.toLowerCase()}`}>
+                              {m.role}
+                            </span>
+
+                            <span className={`badge status ${m.status.toLowerCase()}`}>
+                              {m.status}
+                            </span>
+                          </div>
                         </li>
                       ))}
                     </ul>
@@ -82,9 +88,9 @@ export default function AdminProjects() {
                 </div>
               )}
             </div>
-          ))}
-        </div>
-      </main>
-    </div>
+          );
+        })}
+      </div>
+    </>
   );
 }

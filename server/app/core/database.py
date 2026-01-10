@@ -1,12 +1,15 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-DATABASE_URL = "postgresql://postgres:123456@localhost:5432/labodc"
-# 🔴 đổi password cho đúng máy bạn
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "postgresql+psycopg2://labodc:labodc123@db:5432/labodc_db"
+)
 
 engine = create_engine(
     DATABASE_URL,
-    echo=True   # 👈 hiện SQL cho dễ debug
+    echo=True
 )
 
 SessionLocal = sessionmaker(
@@ -18,7 +21,6 @@ SessionLocal = sessionmaker(
 Base = declarative_base()
 
 
-# Dependency
 def get_db():
     db = SessionLocal()
     try:

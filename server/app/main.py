@@ -21,7 +21,9 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:5173",      # giữ lại để dev local
         "http://127.0.0.1:5173",
     ],
     allow_credentials=True,
@@ -29,8 +31,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # CREATE TABLES
-Base.metadata.create_all(bind=engine)
+@app.on_event("startup")
+def startup():
+    Base.metadata.create_all(bind=engine)
 
 # INCLUDE ROUTERS (CHỈ .router)
 app.include_router(auth_router.router)

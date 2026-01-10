@@ -1,81 +1,406 @@
 * {
   box-sizing: border-box;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Segoe UI", Arial, Helvetica, sans-serif;
 }
 
+body {
+  margin: 0;
+  background: #f1f5f9;
+}
+
+/* ================== LAYOUT ================== */
 .admin-layout {
   display: flex;
   height: 100vh;
-  background: #f4f6f8;
 }
 
-/* SIDEBAR */
+/* ================== SIDEBAR ================== */
 .sidebar {
-  width: 220px;
-  background: #1e293b;
+  width: 240px;
+  background: linear-gradient(180deg, #0f172a, #020617);
   color: white;
-  padding: 20px;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar h2 {
-  margin-bottom: 30px;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 32px;
+  text-align: center;
   color: #38bdf8;
+  letter-spacing: 1px;
 }
 
 .sidebar ul {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
 .sidebar li {
-  padding: 12px;
-  border-radius: 6px;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  border-radius: 10px;
   cursor: pointer;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.25s ease;
+  color: #cbd5f5;
 }
 
-.sidebar li:hover,
+.sidebar li:hover {
+  background: rgba(148, 163, 184, 0.15);
+  transform: translateX(4px);
+}
+
 .sidebar .active {
-  background: #334155;
+  background: linear-gradient(90deg, #2563eb, #38bdf8);
+  color: white;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
 }
 
-/* MAIN */
+/* ================== MAIN ================== */
 .main {
   flex: 1;
-  padding: 20px;
+  padding: 28px;
+  overflow-y: auto;
 }
 
+/* ================== HEADER ================== */
 .header {
   background: white;
-  padding: 16px;
-  border-radius: 8px;
-  margin-bottom: 20px;
+  padding: 18px 24px;
+  border-radius: 14px;
+  margin-bottom: 24px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
 }
 
-/* PROJECTS */
+.header h1 {
+  margin: 0;
+  font-size: 22px;
+  color: #0f172a;
+}
+
+/* ================== PROJECTS ================== */
 .projects-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
 }
 
 .project-card {
   background: white;
-  padding: 16px;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-  transition: transform 0.2s;
+  padding: 20px;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.project-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 4px;
+  width: 100%;
+  background: linear-gradient(90deg, #2563eb, #38bdf8);
 }
 
 .project-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-6px);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.15);
 }
 
 .project-card h3 {
-  margin-bottom: 10px;
+  margin: 12px 0 8px;
   color: #0f172a;
+  font-size: 18px;
+}
+
+.project-card p {
+  font-size: 14px;
+  color: #475569;
+  line-height: 1.5;
+  margin-bottom: 12px;
 }
 
 .project-card span {
+  font-size: 13px;
+  color: #64748b;
+  display: block;
+  margin-bottom: 14px;
+}
+
+/* ================== BUTTON ================== */
+.btn-view {
+  background: linear-gradient(90deg, #2563eb, #38bdf8);
+  border: none;
+  color: white;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-view:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* ================== MEMBERS ================== */
+.member-box {
+  background: #f8fafc;
+  padding: 12px;
+  border-radius: 10px;
+  margin-top: 12px;
+}
+
+.member-box ul {
+  padding-left: 16px;
+  margin: 0;
+}
+
+.member-box li {
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: #334155;
+}
+
+/* ================== USERS ================== */
+.users-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 24px;
+}
+
+.user-card {
+  background: white;
+  padding: 20px;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  transition: all 0.25s ease;
+}
+
+.user-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.15);
+}
+
+.user-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2563eb, #38bdf8);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.user-info h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #0f172a;
+}
+
+.user-info p {
+  margin: 0;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.user-meta {
+  margin-bottom: 12px;
+}
+
+.role-badge {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.role-admin {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.role-mentor {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.role-talent {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.role-enterprise {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
+.role-select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* ================== PROJECTS ================== */
+.project-desc {
   font-size: 14px;
   color: #475569;
+  margin-bottom: 10px;
 }
+
+.project-meta {
+  font-size: 13px;
+  color: #64748b;
+}
+
+/* VIEW BUTTON */
+.btn-view {
+  margin-top: 10px;
+  background: #0f172a;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.btn-view:hover {
+  opacity: 0.9;
+}
+
+/* MEMBER BOX */
+.member-box {
+  margin-top: 14px;
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.member-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px dashed #e5e7eb;
+}
+
+.member-item:last-child {
+  border-bottom: none;
+}
+
+/* BADGES */
+.member-badges {
+  display: flex;
+  gap: 8px;
+}
+
+.badge.role {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  text-transform: uppercase;
+}
+
+/* ROLE COLORS */
+.badge.role.mentor {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.badge.role.talent {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.badge.role.leader {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+/* STATUS BADGES */
+.badge.status {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  text-transform: uppercase;
+}
+
+.badge.status.active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.badge.status.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.badge.status.completed {
+  background: #e5e7eb;
+  color: #334155;
+}
+
+.empty {
+  font-size: 13px;
+  color: #64748b;
+}
+
+/* PROJECT STATUS */
+.project-card {
+  position: relative;
+}
+
+.badge.project-status {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: 999px;
+  letter-spacing: 0.6px;
+}
+
+.badge.project-status.draft {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.badge.project-status.running {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.badge.project-status.completed {
+  background: #dcfce7;
+  color: #166534;
+}
+

@@ -33,6 +33,60 @@ def create_project(
         "project_id": project.id
     }
 
+@router.get("/{project_id}/members")
+def get_project_members(
+    project_id: int,
+    db: Session = Depends(get_db),
+    user=Depends(require_role("enterprise"))
+):
+    project = db.query(Project).filter(
+        Project.id == project_id,
+        Project.owner_id == int(user["sub"])
+    ).first()
+
+    if not project:
+        raise HTTPException(404, "Project not found")
+
+    members = db.query(ProjectMember).filter(
+        ProjectMember.project_id == project_id
+    ).all()
+
+    return [
+        {
+            "user_id": m.user_id,
+            "role": m.role,
+            "status": m.status
+        } for m in members
+    ]
+
+# =========================
+# ENTERPRISE – APPROVE / REJECT MEMBER
+# =========================
+@router.patch("/{project_id}/members/{user_id}")
+def update_member_status(
+    project_id: int,
+    user_id: int,
+    status: str,
+    db: Session = Depends(get_db),
+    user=Depends(require_role("enterprise"))
+):
+    member = db.query(ProjectMember).join(Project).filter(
+        ProjectMember.project_id == project_id,
+        ProjectMember.user_id == user_id,
+        Project.owner_id == int(user["sub"])
+    ).first()
+
+    if not member:
+        raise HTTPException(404, "Member not found")
+
+    if status not in ["approved", "rejected"]:
+        raise HTTPException(400, "Invalid status")
+
+    member.status = status
+    db.commit()
+
+    return {"message": "Status updated"}
+
 
 # =========================
 # TALENT – LIST PROJECTS

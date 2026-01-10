@@ -9,7 +9,7 @@ from app.core.security import hash_password, verify_password, create_token
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
-# ---------------- REGISTER ----------------
+
 @router.post("/register")
 def register(data: RegisterRequest, db: Session = Depends(get_db)):
     if db.query(User).filter(User.email == data.email).first():
@@ -27,7 +27,7 @@ def register(data: RegisterRequest, db: Session = Depends(get_db)):
 
     return {"message": "User registered successfully"}
 
-# ---------------- LOGIN (SWAGGER COMPATIBLE) ----------------
+
 @router.post("/login")
 def login(
     form_data: OAuth2PasswordRequestForm = Depends(),

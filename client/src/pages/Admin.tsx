@@ -1,25 +1,44 @@
-import { useEffect, useState } from "react";
-import api from "../api/axios";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import "../styles/admin.css";
 
 export default function Admin() {
-  const [projects, setProjects] = useState<any[]>([]);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  useEffect(() => {
-    api.get("/projects/admin/projects").then(res => {
-      setProjects(res.data);
-    });
-  }, []);
+  const isActive = (path: string) =>
+    location.pathname.startsWith(path) ? "active" : "";
 
   return (
-    <div>
-      <h2>Admin – All Projects</h2>
-      <ul>
-        {projects.map(p => (
-          <li key={p.project_id}>
-            {p.title} – members: {p.members.length}
+    <div className="admin-layout">
+      <aside className="sidebar">
+        <h2>LabODC</h2>
+        <ul>
+          <li
+            className={isActive("/admin/projects")}
+            onClick={() => navigate("/admin/projects")}
+          >
+            Projects
           </li>
-        ))}
-      </ul>
+
+          <li
+            className={isActive("/admin/users")}
+            onClick={() => navigate("/admin/users")}
+          >
+            Users
+          </li>
+
+          <li
+            className={isActive("/admin/payments")}
+            onClick={() => navigate("/admin/payments")}
+          >
+            Payments
+          </li>
+        </ul>
+      </aside>
+
+      <main className="main">
+        <Outlet />
+      </main>
     </div>
   );
 }

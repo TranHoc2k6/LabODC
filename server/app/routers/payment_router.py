@@ -5,6 +5,7 @@ from app.core.database import get_db
 from app.models.payment import Payment
 from app.schemas.payment_schema import PaymentCreate
 from app.core.dependencies import require_role
+from app.models.project import Project
 
 router = APIRouter(
     prefix="/payments",
@@ -68,3 +69,34 @@ def admin_get_all_payments(
         }
         for p in payments
     ]
+
+# =========================
+# ENTERPRISE – VIEW OWN PAYMENTS
+# =========================
+@router.get("/enterprise")
+def enterprise_get_payments(
+    db: Session = Depends(get_db),
+    user=Depends(require_role("enterprise"))
+):
+    enterprise_id = int(user["sub"])
+
+    payments = (
+        db.query(Payment)
+        .join(Project, Project.id == Payment.project_id)
+        .filter(Project.owner_id == enterprise_id)
+        .all()
+    )
+
+    return [
+        {
+            "id": p.id,
+            "project_id": p.project_id,
+            "total_amount": p.total_amount,
+            "team_amount": p.team_amount,
+            "mentor_amount": p.mentor_amount,
+            "lab_amount": p.lab_amount,
+            "status": p.status
+        }
+        for p in payments
+    ]
+
