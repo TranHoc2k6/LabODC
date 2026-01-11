@@ -1,5 +1,5 @@
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
-import "../styles/enterprise.css";
+import "../../styles/enterprise.css";
 
 export default function EnterpriseLayout() {
   const navigate = useNavigate();

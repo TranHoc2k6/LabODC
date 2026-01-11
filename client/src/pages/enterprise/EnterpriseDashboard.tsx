@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../api/axios";
-import "../styles/enterprise.css";
+import api from "../../api/axios";
+import "../../styles/enterprise.css";
 
 interface Project {
   id: number;
@@ -23,10 +23,14 @@ export default function EnterpriseDashboard() {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
+  const loadProjects = () => {
     api.get("/projects/my-projects")
       .then(res => setProjects(res.data || []))
       .catch(err => console.error(err));
+  };
+
+  useEffect(() => {
+    loadProjects();
   }, []);
 
   const openApplicants = (projectId: number) => {
@@ -36,16 +40,34 @@ export default function EnterpriseDashboard() {
       .catch(err => console.error(err));
   };
 
+  // ===== PROJECT ACTIONS =====
+  const submitProject = async (id: number) => {
+    await api.post(`/projects/${id}/submit`);
+    loadProjects();
+  };
+
+  const cancelProject = async (id: number) => {
+    await api.post(`/projects/${id}/cancel`);
+    loadProjects();
+  };
+
+  const requestChange = async (id: number) => {
+    await api.post(`/projects/${id}/change`);
+    loadProjects();
+  };
+
   return (
     <div className="enterprise-layout">
-      <h1 className="page-title">📁 My Projects</h1>
-      
-      <button
-        className="btn-primary new-project-btn"
-        onClick={() => navigate("/enterprise/projects/create")}
-      >
-        ➕ New Project
-      </button>
+      <div className="page-header">
+        <h1 className="page-title">📁 My Projects</h1>
+
+        <button
+          className="btn-new-project"
+          onClick={() => navigate("/enterprise/projects/create")}
+        >
+          ➕ New Project
+        </button>
+      </div>
 
       <div className="project-grid">
         {projects.map(p => (
@@ -61,9 +83,36 @@ export default function EnterpriseDashboard() {
 
             <div className="card-footer">
               <span>ID #{p.id}</span>
-              <button className="btn-view" onClick={() => openApplicants(p.id)}>
-                View Applicants
-              </button>
+
+              <div className="card-actions">
+                <button className="btn-view" onClick={() => openApplicants(p.id)}>
+                  View Applicants
+                </button>
+
+                {p.status === "draft" && (
+                  <button className="btn-submit" onClick={() => submitProject(p.id)}>
+                    Submit
+                  </button>
+                )}
+
+                {p.status === "approved" && (
+                  <button className="btn-pay">
+                    Proceed to Payment
+                  </button>
+                )}
+
+                {["draft", "submitted"].includes(p.status) && (
+                  <button className="btn-cancel" onClick={() => cancelProject(p.id)}>
+                    Cancel
+                  </button>
+                )}
+
+                {p.status === "active" && (
+                  <button className="btn-change" onClick={() => requestChange(p.id)}>
+                    Request Change
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         ))}

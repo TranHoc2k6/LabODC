@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import api from "../api/axios";
-import "../styles/admin.css";
+import api from "../../api/axios";
+import "../../styles/admin.css";
 
 const roleColors: Record<string, string> = {
   admin: "role-admin",

@@ -10,35 +10,45 @@ from app.models.project_member import ProjectMember
 from app.models.payment import Payment
 from app.models.fund_distribution import FundDistribution
 
-# IMPORT ROUTERS (CHỈ IMPORT MODULE)
-from app.routers import auth_router, user_router, project_router, payment_router
+# IMPORT ROUTERS
+from app.routers import auth_router, user_router, project_router, payment_router, talent_router
 
 app = FastAPI(
     title="LabODC API",
     version="1.0.0"
 )
 
+# === CORS MIDDLEWARE ===
+origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "http://localhost:5173",      # giữ lại để dev local
-        "http://127.0.0.1:5173",
-    ],
+    allow_origins=origins,  # ✅ list of allowed frontend origins
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
-# CREATE TABLES
+# === CREATE TABLES ON STARTUP ===
 @app.on_event("startup")
 def startup():
     Base.metadata.create_all(bind=engine)
+    print("✅ Database tables created")
 
-# INCLUDE ROUTERS (CHỈ .router)
+# === INCLUDE ROUTERS ===
 app.include_router(auth_router.router)
 app.include_router(user_router.router)
 app.include_router(project_router.router)
 app.include_router(payment_router.router)
+app.include_router(talent_router.router)
+
+# === OPTIONAL: ROOT HEALTH CHECK ===
+@app.get("/")
+def root():
+    return {"message": "LabODC API is running"}

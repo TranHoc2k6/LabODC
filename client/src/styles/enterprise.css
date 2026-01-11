@@ -398,3 +398,28 @@
 .btn-primary:hover {
   opacity: .9;
 }
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+/* nút New Project */
+.btn-new-project {
+  background: linear-gradient(135deg, #5f6bff, #3b82f6);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.35);
+  transition: all 0.2s ease;
+}
+
+.btn-new-project:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgba(59, 130, 246, 0.45);
+}

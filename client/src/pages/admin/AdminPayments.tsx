@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import api from "../api/axios";
-import "../styles/admin.css";
-import "../styles/payment.css";
+import api from "../../api/axios";
+import "../../styles/admin.css";
+import "../../styles/payment.css";
 
 export default function AdminPayments() {
   const [payments, setPayments] = useState<any[]>([]);

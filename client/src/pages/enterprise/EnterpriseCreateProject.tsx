@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../api/axios";
-import "../styles/enterprise.css";
+import api from "../../api/axios";
+import "../../styles/enterprise.css";
 
 export default function EnterpriseCreateProject() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const navigate = useNavigate();
 
@@ -20,7 +21,11 @@ export default function EnterpriseCreateProject() {
         description
       });
 
-      navigate("/posts");
+      setSuccess(true); // ✅ hiển thị thông báo
+
+      setTimeout(() => {
+        navigate("/enterprise"); // 👈 quay về dashboard enterprise
+      }, 1500);
     } catch (err) {
       console.error(err);
       alert("Create project failed");
@@ -32,6 +37,12 @@ export default function EnterpriseCreateProject() {
   return (
     <div className="enterprise-layout">
       <h1 className="page-title">➕ Create New Project</h1>
+
+      {success && (
+        <div className="success-box">
+          ✅ Project created successfully
+        </div>
+      )}
 
       <form className="project-form" onSubmit={submit}>
         <label>

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
+import  {jwtDecode} from "jwt-decode";
 import "../styles/login.css";
 
 type JwtPayload = {
@@ -11,13 +11,23 @@ type JwtPayload = {
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async () => {
+    if (!email || !password) {
+      setError("Email và mật khẩu không được để trống!");
+      return;
+    }
+
+    setError("");
+    setLoading(true);
+
     try {
-      const formData = new URLSearchParams();
-      formData.append("username", email);
-      formData.append("password", password);
+      // === Gửi form-urlencoded đúng chuẩn FastAPI ===
+      const formData = new URLSearchParams({ username: email, password });
+      console.log("Sending form data:", formData.toString()); // DEBUG
 
       const res = await api.post("/auth/login", formData, {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -31,11 +41,14 @@ export default function Login() {
       if (payload.role === "admin") navigate("/admin/projects");
       else if (payload.role === "enterprise") navigate("/enterprise");
       else if (payload.role === "talent") navigate("/talent");
-      else alert("Unknown role");
+      else setError("Role không xác định");
 
-    } catch (err) {
-      alert("Login failed");
-      console.error(err);
+    } catch (err: any) {
+      console.error("Login error:", err.response?.data || err);
+      const message = err.response?.data?.detail?.[0]?.msg || err.message || "Login failed";
+      setError("Đăng nhập thất bại: " + message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -57,7 +70,11 @@ export default function Login() {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        <button onClick={handleLogin}>Login</button>
+        {error && <p style={{ color: "red" }}>{error}</p>}
+
+        <button onClick={handleLogin} disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
+        </button>
       </div>
     </div>
   );

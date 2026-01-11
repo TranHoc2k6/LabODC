@@ -1,23 +1,33 @@
 import { Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
-import Talent from "./pages/Talent";
-import EnterpriseDashboard from "./pages/EnterpriseDashboard";
-import EnterprisePayments from "./pages/EnterprisePayments";
 import ProtectedRoute from "./auth/ProtectedRoute";
 
-import Admin from "./pages/Admin";
-import AdminProjects from "./pages/AdminProjects";
-import AdminUsers from "./pages/AdminUsers";
-import AdminPayments from "./pages/AdminPayments";
-import EnterpriseLayout from "./pages/EnterpriseLayout";
-import EnterpriseCreateProject from "./pages/EnterpriseCreateProject";  
+/* ========== ADMIN ========== */
+import Admin from "./pages/admin/Admin";
+import AdminProjects from "./pages/admin/AdminProjects";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminPayments from "./pages/admin/AdminPayments";
+
+/* ========== ENTERPRISE ========== */
+import EnterpriseLayout from "./pages/enterprise/EnterpriseLayout";
+import EnterpriseDashboard from "./pages/enterprise/EnterpriseDashboard";
+import EnterprisePayments from "./pages/enterprise/EnterprisePayments";
+import EnterpriseCreateProject from "./pages/enterprise/EnterpriseCreateProject";
+
+/* ========== TALENT ========== */
+import TalentLayout from "./pages/talent/Talent";
+import TalentDashboard from "./pages/talent/TalentDashboard";
+import TalentProjects from "./pages/talent/TalentProjects";
+import TalentPayments from "./pages/talent/TalentPayments";
+import TalentProfile from "./pages/talent/TalentProfile";
 
 function App() {
   return (
     <Routes>
+      {/* LOGIN */}
       <Route path="/" element={<Login />} />
 
-      {/* ADMIN */}
+      {/* ================= ADMIN ================= */}
       <Route
         path="/admin"
         element={
@@ -26,12 +36,13 @@ function App() {
           </ProtectedRoute>
         }
       >
+        <Route index element={<AdminProjects />} />
         <Route path="projects" element={<AdminProjects />} />
         <Route path="users" element={<AdminUsers />} />
         <Route path="payments" element={<AdminPayments />} />
       </Route>
 
-      {/* ENTERPRISE */}
+      {/* ================= ENTERPRISE ================= */}
       <Route
         path="/enterprise"
         element={
@@ -40,25 +51,26 @@ function App() {
           </ProtectedRoute>
         }
       >
+        <Route index element={<EnterpriseDashboard />} />
         <Route path="dashboard" element={<EnterpriseDashboard />} />
         <Route path="payments" element={<EnterprisePayments />} />
-        <Route
-              path="/enterprise/projects/create"
-              element={<EnterpriseCreateProject />}
-/>
-
+        <Route path="projects/create" element={<EnterpriseCreateProject />} />
       </Route>
 
-
-      {/* TALENT */}
+      {/* ================= TALENT ================= */}
       <Route
         path="/talent"
         element={
           <ProtectedRoute roles={["talent"]}>
-            <Talent />
+            <TalentLayout />
           </ProtectedRoute>
         }
-      />
+      >
+        <Route index element={<TalentDashboard />} />
+        <Route path="projects" element={<TalentProjects />} />
+        <Route path="payments" element={<TalentPayments />} />
+        <Route path="profile" element={<TalentProfile />} />
+      </Route>
     </Routes>
   );
 }
