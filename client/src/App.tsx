@@ -15,7 +15,7 @@ import EnterprisePayments from "./pages/enterprise/EnterprisePayments";
 import EnterpriseCreateProject from "./pages/enterprise/EnterpriseCreateProject";
 
 /* ========== TALENT ========== */
-import TalentLayout from "./pages/talent/Talent";
+import TalentLayout from "./pages/talent/TalentLayout";   // 🔥 THIẾU DÒNG NÀY
 import TalentDashboard from "./pages/talent/TalentDashboard";
 import TalentProjects from "./pages/talent/TalentProjects";
 import TalentPayments from "./pages/talent/TalentPayments";

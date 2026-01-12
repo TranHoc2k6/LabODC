@@ -6,6 +6,9 @@ from app.models.payment import Payment
 from app.schemas.payment_schema import PaymentCreate
 from app.core.dependencies import require_role
 from app.models.project import Project
+from app.models.project_member import ProjectMember
+from app.models.project import Project
+
 
 router = APIRouter(
     prefix="/payments",
@@ -100,3 +103,41 @@ def enterprise_get_payments(
         for p in payments
     ]
 
+# =========================
+# TALENT – VIEW MY PAYMENTS
+# =========================
+@router.get("/talent")
+def talent_get_payments(
+    db: Session = Depends(get_db),
+    user=Depends(require_role("talent"))
+):
+    talent_id = int(user["sub"])
+
+    rows = (
+        db.query(Payment, ProjectMember, Project)
+        .join(Project, Project.id == Payment.project_id)
+        .join(ProjectMember, ProjectMember.project_id == Project.id)
+        .filter(ProjectMember.user_id == talent_id)
+        .filter(ProjectMember.status == "approved")
+        .all()
+    )
+
+    result = []
+
+    for payment, member, project in rows:
+        # chia team_amount cho số talent trong project
+        total_talents = db.query(ProjectMember)\
+            .filter(ProjectMember.project_id == project.id, ProjectMember.status == "approved")\
+            .count()
+
+        my_amount = payment.team_amount / total_talents if total_talents > 0 else 0
+
+        result.append({
+            "id": payment.id,
+            "projectTitle": project.title,
+            "amount": my_amount,
+            "date": payment.id,  # tạm dùng id làm date
+            "status": payment.status
+        })
+
+    return result

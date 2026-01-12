@@ -1,46 +1,61 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../../api/axios";
+import "../../styles/talent.css";
+
+interface Project {
+  project_id: number;
+  name: string;
+  status: string;
+  mentor: string;
+  role: string;
+  my_fund: number;
+}
 
 export default function TalentDashboard() {
-  const [projects, setProjects] = useState<any[]>([]);
-  const [payments, setPayments] = useState<any[]>([]);
-  const [me, setMe] = useState<any>({});
+  const [projects, setProjects] = useState<Project[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    api.get("/talent/me").then(res => setMe(res.data));
-    api.get("/talent/projects").then(res => setProjects(res.data));
-    api.get("/talent/payments").then(res => setPayments(res.data));
+    api.get("/talent/projects")
+      .then(res => setProjects(res.data))
+      .catch(err => console.error(err));
   }, []);
 
-  const earned = payments
-    .filter(p => p.status === "paid")
-    .reduce((sum, p) => sum + p.team_amount, 0);
-
   return (
-    <>
-      <h1>🎯 My LabODC</h1>
+    <div className="talent-layout">
+      <>
+  <h1 className="page-title">🎓 My ODC Projects</h1>
 
-      <div className="dashboard-grid">
-        <div className="dash-card">
-          <h4>Active Projects</h4>
-          <p>{projects.length}</p>
+  <div className="project-grid">
+    {projects.map(p => (
+      <div className="project-card" key={p.project_id}>
+
+        <div className="card-header">
+          <h3>{p.name}</h3>
+          <span className={`badge ${p.status}`}>{p.status}</span>
         </div>
 
-        <div className="dash-card">
-          <h4>Role</h4>
-          <p>{me.role}</p>
+        <p className="desc">
+          Mentor: {p.mentor}<br/>
+          Role: {p.role.toUpperCase()}
+        </p>
+
+        <div className="card-footer">
+          <span>💰 {p.my_fund.toLocaleString()} VND</span>
+          <button
+            className="btn-view"
+            onClick={() => navigate(`/talent/projects/${p.project_id}`)}
+          >
+            Open
+          </button>
         </div>
 
-        <div className="dash-card">
-          <h4>Email</h4>
-          <p>{me.email}</p>
-        </div>
-
-        <div className="dash-card">
-          <h4>Earned</h4>
-          <p>${earned.toFixed(2)}</p>
-        </div>
       </div>
-    </>
+    ))}
+  </div>
+</>
+
+    </div>
   );
 }

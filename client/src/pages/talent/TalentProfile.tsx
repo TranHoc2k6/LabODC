@@ -5,7 +5,7 @@ export default function TalentProfile() {
   const [profile, setProfile] = useState<any>({});
 
   useEffect(() => {
-    api.get("/talent/me").then(res => setProfile(res.data));
+    api.get("/users/me").then(res => setProfile(res.data));
   }, []);
 
   return (
