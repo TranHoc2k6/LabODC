@@ -1,18 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
-from datetime import datetime
-
-class PaymentOut(BaseModel):
-    id: int
-    amount: float
-    status: str
-    user_id: int
-    project_id: int
-    created_at: datetime
-
-    class Config:
-        orm_mode = True
-
+from datetime import datetime  
 
 class PaymentCreate(BaseModel):
     project_id: int
@@ -27,14 +14,12 @@ class PaymentRead(BaseModel):
 class Config:
     from_attributes = True
 
-    
 class PaymentOut(BaseModel):
     id: int
+    user_id: int
     amount: float
     status: str
-    user_id: int
-    project_id: int
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True  # Pydantic V2: thay cho orm_mode=True
