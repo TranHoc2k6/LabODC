@@ -1,140 +1,56 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-
+from typing import List
 from app.core.database import get_db
-from app.core.dependencies import require_role
+from app.models.talent import Talent
+from app.models.project import Project, ProjectMember
 from app.models.user import User
-from app.models.team import TeamMember
-from app.models.task import MentorTask, TaskSubmission
-from app.models.fund import FundAllocation
-from app.models.report import ProjectReport
-from app.schemas.report_schema import ReportIn
+from app.core.permissions import require_role
+from app.core.constants import ROLE_TALENT  
+from app.services.talent import TalentService
 
-router = APIRouter(prefix="/talent", tags=["Talent"])
+router = APIRouter(prefix="/talent", tags=["talent"])
 
-
-# =========================
-# MY PROFILE
-# =========================
-@router.get("/me")
-def my_profile(
-    user=Depends(require_role("talent")),
-    db: Session = Depends(get_db)
+@router.post("/profile")
+def create_talent_profile(
+    data: dict,
+    db: Session = Depends(get_db),
+    user = Depends(require_role(ROLE_TALENT))
 ):
-    talent_id = int(user["sub"])
-    return db.get(User, talent_id)
+    return TalentService.create_profile(db, user, data)
 
-
-# =========================
-# MY PROJECTS
-# =========================
 @router.get("/projects")
-def my_projects(
-    user=Depends(require_role("talent")),
-    db: Session = Depends(get_db)
+def get_available_projects(
+    db: Session = Depends(get_db),
+    user = Depends(require_role(ROLE_TALENT))
 ):
-    talent_id = int(user["sub"])
+    return db.query(Project).filter(Project.status == "approved").all()
 
-    memberships = (
-        db.query(TeamMember)
-        .filter(TeamMember.talent_id == talent_id)
-        .all()
-    )
-
-    results = []
-
-    for m in memberships:
-        project = m.team.project
-
-        my_fund = sum(
-            f.amount for f in project.funds if f.talent_id == talent_id
-        )
-
-        results.append({
-            "project_id": project.id,
-            "name": project.name,
-            "status": project.status,
-            "mentor": project.mentor.full_name if project.mentor else None,
-            "role": m.role,
-            "my_fund": my_fund
-        })
-
-    return results
-
-
-# =========================
-# MY TASKS
-# =========================
-@router.get("/projects/{project_id}/tasks")
-def my_tasks(
+@router.post("/projects/{project_id}/join")
+def join_project(
     project_id: int,
-    user=Depends(require_role("talent")),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    user = Depends(require_role(ROLE_TALENT))
 ):
-    talent_id = int(user["sub"])
+    if not user.talent:
+        raise HTTPException(400, "Talent profile missing")
 
-    is_member = (
-        db.query(TeamMember)
-        .filter(
-            TeamMember.talent_id == talent_id,
-            TeamMember.team.has(project_id=project_id)
-        )
-        .first()
-    )
+    project = db.query(Project).filter(Project.id == project_id).first()
+    if not project or project.status != "approved":
+        raise HTTPException(400, "Project not available")
 
-    if not is_member:
-        raise HTTPException(status_code=403, detail="Not in this project")
+    existing = db.query(ProjectMember).filter(
+        ProjectMember.project_id == project_id,
+        ProjectMember.talent_id == user.talent.id
+    ).first()
 
-    return db.query(MentorTask).filter(MentorTask.project_id == project_id).all()
+    if existing:
+        raise HTTPException(400, "Already joined this project")
 
-
-# =========================
-# SUBMIT TASK
-# =========================
-@router.post("/tasks/{task_id}/submit")
-def submit_task(
-    task_id: int,
-    file: UploadFile = File(...),
-    user=Depends(require_role("talent")),
-    db: Session = Depends(get_db)
-):
-    talent_id = int(user["sub"])
-
-    submission = TaskSubmission(
-        task_id=task_id,
-        talent_id=talent_id,
-        status="submitted",
-        result_file=file.filename   # upload cloudinary sau
-    )
-
-    db.add(submission)
+    member = ProjectMember(project_id=project_id, talent_id=user.talent.id)
+    db.add(member)
     db.commit()
 
-    return {"message": "Task submitted"}
+    return {"message": "Joined project successfully"}
 
 
-# =========================
-# MY FUNDS
-# =========================
-@router.get("/funds")
-def my_funds(
-    user=Depends(require_role("talent")),
-    db: Session = Depends(get_db)
-):
-    talent_id = int(user["sub"])
-
-    funds = (
-        db.query(FundAllocation)
-        .filter(FundAllocation.talent_id == talent_id)
-        .all()
-    )
-
-    return [
-        {
-            "project": f.project.name,
-            "amount": f.amount,
-            "paid": f.paid,
-            "pending": f.amount - f.paid
-        }
-        for f in funds
-    ]

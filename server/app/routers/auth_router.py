@@ -1,47 +1,46 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-
 from app.core.database import get_db
-from app.models.user import User
-from app.schemas.auth import RegisterRequest, TokenResponse
-from app.core.security import hash_password, verify_password, create_token
+from app.schemas.auth_schemas import UserRegister, UserLogin, Token
+from app.services.auth import AuthService
+from fastapi.security import OAuth2PasswordRequestForm
+from app.core.deps import get_current_user
 
-router = APIRouter(prefix="/auth", tags=["Auth"])
+router = APIRouter(prefix="/auth", tags=["auth"])
 
-# ===== REGISTER =====
-@router.post("/register", response_model=TokenResponse)
-def register(data: RegisterRequest, db: Session = Depends(get_db)):
-    if db.query(User).filter(User.email == data.email).first():
-        raise HTTPException(status_code=400, detail="Email already exists")
+@router.post("/register", response_model=Token)
+def register(user_data: UserRegister, db: Session = Depends(get_db)):
+    try:
+        user = AuthService.register_user(db, user_data)
+        token = AuthService.create_token(user)
+        return {"access_token": token}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
-    user = User(
-        email=data.email,
-        hashed_password=hash_password(data.password),
-        full_name=data.full_name,
-        role=data.role
+@router.post("/login", response_model=Token)
+def login(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db)
+):
+    user = AuthService.authenticate_by_email(
+        db,
+        form_data.username,   # Swagger dùng "username"
+        form_data.password
     )
-    db.add(user)
-    db.commit()
-    db.refresh(user)
 
-    token = create_token(user.id, user.role)
-    return {"access_token": token, "token_type": "bearer"}
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
 
-# ===== LOGIN =====
-@router.post("/login", response_model=TokenResponse)
-def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    """
-    form_data.username = email
-    form_data.password = password
-    """
-    user = db.query(User).filter(User.email == form_data.username).first()
+    token = AuthService.create_token(user)
+    return {
+        "access_token": token,
+        "token_type": "bearer"
+    }
 
-    if not user or not verify_password(form_data.password, user.hashed_password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid credentials"
-        )
-
-    token = create_token(user.id, user.role)
-    return {"access_token": token, "token_type": "bearer"}
+@router.get("/me")
+def me(user = Depends(get_current_user)):
+    return {
+        "id": user.id,
+        "email": user.email,
+        "role": user.role
+    }

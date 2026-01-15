@@ -1,0 +1,11 @@
+.mentor-dashboard, .mentor-projects, .mentor-reports {
+  padding: 32px;
+}
+
+.project-card {
+  background: white;
+  padding: 20px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  border-left: 4px solid var(--secondary);
+}

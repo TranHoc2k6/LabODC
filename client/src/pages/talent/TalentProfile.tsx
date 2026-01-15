@@ -1,25 +1,50 @@
-import { useEffect, useState } from "react";
-import api from "../../api/axios";
+import { useState } from "react";
+import { createTalentProfile } from "../../api/talent";
+import "../../styles/talent.css";
 
 export default function TalentProfile() {
-  const [profile, setProfile] = useState<any>({});
+  const [form, setForm] = useState({
+    full_name: "",
+    skills: "",
+    bio: ""
+  });
 
-  useEffect(() => {
-    api.get("/users/me").then(res => setProfile(res.data));
-  }, []);
+  const submit = async () => {
+    await createTalentProfile(form);
+    alert("Profile created");
+  };
 
   return (
     <>
-      <h1>👤 My Profile</h1>
+      <h1>Talent Profile</h1>
 
-      <label>Full name</label>
-      <input value={profile.full_name || ""} readOnly />
+      <div className="talent-profile-form">
+        <input
+          placeholder="Full name"
+          value={form.full_name}
+          onChange={(e) =>
+            setForm({ ...form, full_name: e.target.value })
+          }
+        />
 
-      <label>Email</label>
-      <input value={profile.email || ""} readOnly />
+        <input
+          placeholder="Skills"
+          value={form.skills}
+          onChange={(e) =>
+            setForm({ ...form, skills: e.target.value })
+          }
+        />
 
-      <label>Role</label>
-      <input value={profile.role || ""} readOnly />
+        <textarea
+          placeholder="Bio"
+          value={form.bio}
+          onChange={(e) =>
+            setForm({ ...form, bio: e.target.value })
+          }
+        />
+
+        <button onClick={submit}>Save</button>
+      </div>
     </>
   );
 }

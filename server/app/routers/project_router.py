@@ -1,179 +1,51 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-
+from typing import List
 from app.core.database import get_db
-from app.core.dependencies import require_role, get_current_user
-from app.schemas.project_schema import ProjectCreateSchema
+from app.schemas.project_schema import ProjectCreate, ProjectResponse
+from app.services.project import ProjectService
 from app.models.project import Project
-from app.models.project_member import ProjectMember
+from app.core.deps import get_current_user
+from app.core.permissions import require_role
+from app.core.constants import ROLE_ENTERPRISE
+from app.core.constants import ROLE_LAB_ADMIN
+from app.core.constants import ROLE_TALENT
 
-router = APIRouter(prefix="/projects", tags=["Projects"])
 
+router = APIRouter(prefix="/projects", tags=["projects"])
 
-# =========================
-# ENTERPRISE – CREATE PROJECT
-# =========================
-@router.post("/")
+@router.post("/", response_model=ProjectResponse)
 def create_project(
-    data: ProjectCreateSchema,
+    data: ProjectCreate,
     db: Session = Depends(get_db),
-    user=Depends(require_role("enterprise"))
+    user = Depends(require_role(ROLE_ENTERPRISE))
 ):
-    project = Project(
-        title=data.title,
-        description=data.description,
-        owner_id=int(user["sub"])
+    if not user.enterprise or len(user.enterprise) == 0:
+        raise HTTPException(status_code=400, detail="Enterprise account not found")
+
+    enterprise = user.enterprise[0]   # lấy enterprise đầu tiên
+
+    project = ProjectService.create_project(
+        db,
+        data.dict(),
+        enterprise_id=enterprise.id
     )
-    db.add(project)
-    db.commit()
-    db.refresh(project)
-
-    return {
-        "message": "Project created",
-        "project_id": project.id
-    }
-
-@router.get("/{project_id}/members")
-def get_project_members(
-    project_id: int,
-    db: Session = Depends(get_db),
-    user=Depends(require_role("enterprise"))
-):
-    project = db.query(Project).filter(
-        Project.id == project_id,
-        Project.owner_id == int(user["sub"])
-    ).first()
-
-    if not project:
-        raise HTTPException(404, "Project not found")
-
-    members = db.query(ProjectMember).filter(
-        ProjectMember.project_id == project_id
-    ).all()
-
-    return [
-        {
-            "user_id": m.user_id,
-            "role": m.role,
-            "status": m.status
-        } for m in members
-    ]
-
-# =========================
-# ENTERPRISE – APPROVE / REJECT MEMBER
-# =========================
-@router.patch("/{project_id}/members/{user_id}")
-def update_member_status(
-    project_id: int,
-    user_id: int,
-    status: str,
-    db: Session = Depends(get_db),
-    user=Depends(require_role("enterprise"))
-):
-    member = db.query(ProjectMember).join(Project).filter(
-        ProjectMember.project_id == project_id,
-        ProjectMember.user_id == user_id,
-        Project.owner_id == int(user["sub"])
-    ).first()
-
-    if not member:
-        raise HTTPException(404, "Member not found")
-
-    if status not in ["approved", "rejected"]:
-        raise HTTPException(400, "Invalid status")
-
-    member.status = status
-    db.commit()
-
-    return {"message": "Status updated"}
+    return project
 
 
-# =========================
-# TALENT – LIST PROJECTS
-# =========================
-@router.get("/")
+@router.get("/", response_model=List[ProjectResponse])
 def list_projects(
+    status: str = None,
     db: Session = Depends(get_db),
-    user=Depends(require_role("talent"))
+    user = Depends(get_current_user)   # chỉ cần login
 ):
-    return db.query(Project).all()
+    return ProjectService.get_projects_by_status(db, status) if status else db.query(Project).all()
 
-
-# =========================
-# TALENT – JOIN PROJECT
-# =========================
-@router.post("/{project_id}/join")
-def join_project(
-    project_id: int,
+@router.post("/{id}/validate")
+def validate_project(
+    id: int,
     db: Session = Depends(get_db),
-    user=Depends(require_role("talent"))
+    admin = Depends(require_role(ROLE_LAB_ADMIN))
 ):
-    user_id = int(user["sub"])
+    return ProjectService.validate_project(db, id, admin.id)
 
-    project = db.query(Project).filter(Project.id == project_id).first()
-    if not project:
-        raise HTTPException(404, "Project not found")
-
-    exists = db.query(ProjectMember).filter(
-        ProjectMember.project_id == project_id,
-        ProjectMember.user_id == user_id
-    ).first()
-
-    if exists:
-        raise HTTPException(400, "Already joined")
-
-    member = ProjectMember(
-        project_id=project_id,
-        user_id=user_id,
-        role="talent",
-        status="pending"
-    )
-
-    db.add(member)
-    db.commit()
-
-    return {"message": "Join request sent"}
-
-
-# =========================
-# ADMIN – VIEW ALL PROJECTS (+ MEMBERS)
-# =========================
-@router.get("/admin/projects")
-def admin_get_all_projects(
-    db: Session = Depends(get_db),
-    user=Depends(require_role("admin"))
-):
-    projects = db.query(Project).all()
-
-    result = []
-    for p in projects:
-        members = db.query(ProjectMember).filter(
-            ProjectMember.project_id == p.id
-        ).all()
-
-        result.append({
-            "project_id": p.id,
-            "title": p.title,
-            "members": [
-                {
-                    "user_id": m.user_id,
-                    "role": m.role,
-                    "status": m.status
-                } for m in members
-            ]
-        })
-
-    return result
-
-
-# =========================
-# ENTERPRISE – VIEW OWN PROJECTS
-# =========================
-@router.get("/my-projects")
-def get_my_projects(
-    db: Session = Depends(get_db),
-    user=Depends(require_role("enterprise"))
-):
-    return db.query(Project).filter(
-        Project.owner_id == int(user["sub"])
-    ).all()

@@ -1,74 +1,67 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import api from "../../api/axios";
+import { createProject } from "../../api/enterprise";
 import "../../styles/enterprise.css";
 
 export default function EnterpriseCreateProject() {
   const [title, setTitle] = useState("");
+  const [skills, setSkills] = useState("");
+  const [budget, setBudget] = useState("");
   const [description, setDescription] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
 
-  const navigate = useNavigate();
+  const handleSubmit = async () => {
+    await createProject({
+      title,
+      skills,
+      description,
+      budget: Number(budget),
+    });
 
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      await api.post("/projects", {
-        title,
-        description
-      });
-
-      setSuccess(true); // ✅ hiển thị thông báo
-
-      setTimeout(() => {
-        navigate("/enterprise"); // 👈 quay về dashboard enterprise
-      }, 1500);
-    } catch (err) {
-      console.error(err);
-      alert("Create project failed");
-    } finally {
-      setLoading(false);
-    }
+    alert("Project submitted to Lab for approval!");
+    setTitle("");
+    setSkills("");
+    setBudget("");
+    setDescription("");
   };
 
   return (
-    <div className="enterprise-layout">
-      <h1 className="page-title">➕ Create New Project</h1>
+    <>
+      <h1 className="page-title">Create New Project</h1>
 
-      {success && (
-        <div className="success-box">
-          ✅ Project created successfully
-        </div>
-      )}
+      <div className="table-container">
+        <input
+          className="input"
+          placeholder="Project title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
 
-      <form className="project-form" onSubmit={submit}>
-        <label>
-          Project Title
-          <input
-            value={title}
-            onChange={e => setTitle(e.target.value)}
-            required
-            placeholder="e.g. AI Resume Scanner"
-          />
-        </label>
+        <input
+          className="input"
+          placeholder="Required skills (React, Node, AI...)"
+          value={skills}
+          onChange={(e) => setSkills(e.target.value)}
+        />
 
-        <label>
-          Description
-          <textarea
-            value={description}
-            onChange={e => setDescription(e.target.value)}
-            required
-            placeholder="Describe your project requirements..."
-          />
-        </label>
+        <input
+          className="input"
+          placeholder="Budget ($)"
+          type="number"
+          value={budget}
+          onChange={(e) => setBudget(e.target.value)}
+        />
 
-        <button className="btn-primary" disabled={loading}>
-          {loading ? "Creating..." : "Create Project"}
+        <textarea
+          className="input"
+          placeholder="Project description"
+          rows={4}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+
+        <button className="btn" onClick={handleSubmit}>
+          Submit to Lab
         </button>
-      </form>
-    </div>
+      </div>
+    </>
   );
 }

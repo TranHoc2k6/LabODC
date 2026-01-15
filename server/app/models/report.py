@@ -1,11 +1,20 @@
-from sqlalchemy import Integer, Column, ForeignKey, String, Text
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime
+from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
 from app.core.database import Base
 
-class ProjectReport(Base):
-    __tablename__ = "project_reports"
-
-    id = Column(Integer, primary_key=True)
+class Report(Base):
+    __tablename__ = "reports"
+    
+    id = Column(Integer, primary_key=True, index=True)
     project_id = Column(Integer, ForeignKey("projects.id"))
-    leader_id = Column(Integer, ForeignKey("users.id"))
+    submitted_by = Column(Integer, ForeignKey("users.id"))
+    report_type = Column(String)  # monthly, phase, final
+    
+    title = Column(String)
     content = Column(Text)
-    status = Column(String)  # submitted, approved, rejected
+    attachments = Column(Text)  # JSON string of file URLs
+    
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    project = relationship("Project", backref="reports")

@@ -1,21 +1,22 @@
-from sqlalchemy import Column, Integer, ForeignKey, String, DateTime
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime
+from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
 from app.core.database import Base
 
-class MentorTask(Base):
-    __tablename__ = "mentor_tasks"
-
-    id = Column(Integer, primary_key=True)
+class Task(Base):
+    __tablename__ = "tasks"
+    
+    id = Column(Integer, primary_key=True, index=True)
     project_id = Column(Integer, ForeignKey("projects.id"))
-    title = Column(String)
-    deadline = Column(DateTime)
-    excel_file = Column(String)
-
-
-class TaskSubmission(Base):
-    __tablename__ = "task_submissions"
-
-    id = Column(Integer, primary_key=True)
-    task_id = Column(Integer, ForeignKey("mentor_tasks.id"))
-    talent_id = Column(Integer, ForeignKey("users.id"))
-    status = Column(String)
-    result_file = Column(String)
+    assigned_to = Column(Integer, ForeignKey("talents.id"), nullable=True)
+    
+    title = Column(String, nullable=False)
+    description = Column(Text)
+    status = Column(String, default="todo")  # todo, in_progress, done
+    excel_file_url = Column(String)  # Link to Excel template
+    
+    created_by = Column(Integer, ForeignKey("mentors.id"))
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    
+    project = relationship("Project", backref="tasks")
