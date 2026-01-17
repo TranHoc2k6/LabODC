@@ -13,11 +13,12 @@ STATUS_CANCELLED = "cancelled"
 
 # User roles
 ROLE_SYSTEM_ADMIN = "system_admin"
-ROLE_LAB_ADMIN = "lab_admin"
+ROLE_LAB_ADMIN = "admin"
 ROLE_ENTERPRISE = "enterprise"
 ROLE_MENTOR = "mentor"
 ROLE_TALENT = "talent"
 ROLE_TALENT_LEADER = "talent_leader"
+ROLE_ADMIN = "admin"
 
 # Payment status
 PAYMENT_PENDING = "pending"

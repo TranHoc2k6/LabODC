@@ -8,16 +8,39 @@ from app.models.user import User
 from app.core.permissions import require_role
 from app.core.constants import ROLE_TALENT  
 from app.services.talent import TalentService
+from app.schemas.talent_schema import TalentCreate, TalentResponse
 
 router = APIRouter(prefix="/talent", tags=["talent"])
 
-@router.post("/profile")
+@router.post(
+    "/profile",
+    response_model=TalentResponse,
+    status_code=201
+)
 def create_talent_profile(
-    data: dict,
+    data: TalentCreate,
     db: Session = Depends(get_db),
     user = Depends(require_role(ROLE_TALENT))
 ):
-    return TalentService.create_profile(db, user, data)
+    return TalentService.create_profile(db, user, data.dict())
+
+@router.get("/profile/me", response_model=TalentResponse)
+def get_my_profile(
+    db: Session = Depends(get_db),
+    user = Depends(require_role(ROLE_TALENT))
+):
+    talent = db.query(Talent).filter_by(user_id=user.id).first()
+
+    if not talent:
+        raise HTTPException(status_code=404, detail="Profile not found")
+
+    return {
+        "id": talent.id,
+        "full_name": user.full_name,
+        "skills": talent.skills,
+        "bio": talent.bio,
+    }
+
 
 @router.get("/projects")
 def get_available_projects(
@@ -33,24 +56,28 @@ def join_project(
     user = Depends(require_role(ROLE_TALENT))
 ):
     if not user.talent:
-        raise HTTPException(400, "Talent profile missing")
+        raise HTTPException(status_code=400, detail="Talent profile missing")
+
+    talent = user.talent[0]
 
     project = db.query(Project).filter(Project.id == project_id).first()
     if not project or project.status != "approved":
-        raise HTTPException(400, "Project not available")
+        raise HTTPException(status_code=400, detail="Project not available")
 
     existing = db.query(ProjectMember).filter(
         ProjectMember.project_id == project_id,
-        ProjectMember.talent_id == user.talent.id
+        ProjectMember.talent_id == talent.id
     ).first()
 
     if existing:
-        raise HTTPException(400, "Already joined this project")
+        raise HTTPException(status_code=400, detail="Already joined this project")
 
-    member = ProjectMember(project_id=project_id, talent_id=user.talent.id)
+    member = ProjectMember(
+        project_id=project_id,
+        talent_id=talent.id
+    )
+
     db.add(member)
     db.commit()
 
     return {"message": "Joined project successfully"}
-
-

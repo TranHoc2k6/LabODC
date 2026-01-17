@@ -1,3 +1,4 @@
+/* ================= LOGO ================= */
 .logo {
   font-size: 28px;
   font-weight: bold;
@@ -6,6 +7,7 @@
   margin-bottom: 40px;
 }
 
+/* ================= LAYOUT ================= */
 .enterprise-layout {
   display: flex;
   height: 100vh;
@@ -14,10 +16,10 @@
 .enterprise-layout .admin-content {
   flex: 1;
   padding: 40px;
-  background: #f3f6fb;
+  background: linear-gradient(180deg, #f7faff, #f3f6fb);
 }
 
-/* ===== ENTERPRISE FORM ===== */
+/* ================= INPUT ================= */
 .input {
   width: 100%;
   padding: 14px;
@@ -26,6 +28,7 @@
   border: 1px solid #ddd;
   font-size: 15px;
   outline: none;
+  background: white;
 }
 
 .input:focus {
@@ -33,12 +36,13 @@
   box-shadow: 0 0 0 2px rgba(31, 111, 255, 0.15);
 }
 
-/* ===== ENTERPRISE DASHBOARD CARDS ===== */
+/* ================= DASHBOARD GRID ================= */
 .enterprise-grid {
   display: flex;
   gap: 25px;
 }
 
+/* ================= ENTERPRISE CARD ================= */
 .enterprise-card {
   background: white;
   padding: 25px;
@@ -53,13 +57,10 @@
   font-size: 32px;
 }
 
-.enterprise-layout .admin-content {
-  background: linear-gradient(180deg, #f7faff, #f3f6fb);
-}
-
+/* ================= STAT CARD ================= */
 .stat-card {
   background: white;
-  padding: 28px;              /* nhỏ lại */
+  padding: 28px;
   border-radius: 18px;
   box-shadow: 0 15px 40px rgba(15, 23, 42, 0.06);
   position: relative;
@@ -67,16 +68,25 @@
   transition: 0.3s ease;
 }
 
+/* 🔥 OVERLAY – FIX KHÔNG ĂN CLICK */
 .stat-card::before {
   content: "";
   position: absolute;
   inset: 0;
   background: linear-gradient(135deg, #1f6fff, #4fc3ff);
-  opacity: 0.04;   /* từ 0.06 → 0.04 cho nhạt giống ảnh 2 */
+  opacity: 0.04;
+  pointer-events: none;   /* ⭐ FIX QUAN TRỌNG */
+  z-index: 0;
+}
+
+/* 🔥 ĐẨY NỘI DUNG LÊN TRÊN OVERLAY */
+.stat-card > * {
+  position: relative;
+  z-index: 1;
 }
 
 .stat-card p {
-  font-size: 34px;                      /* từ 44 → 34 */
+  font-size: 34px;
   font-weight: 700;
   color: #2563eb;
 }
@@ -85,18 +95,106 @@
   color: #10b981;
 }
 
-
 .stat-card h3 {
-  font-size: 16px;                      /* to hơn */
+  font-size: 16px;
   font-weight: 700;
   letter-spacing: 1px;
   color: #1e293b;
   margin-bottom: 24px;
 }
 
-
+/* ================= STATS GRID ================= */
 .stats-grid {
-  display: grid;                 /* BẠN ĐÃ LÀM MẤT DÒNG NÀY */
+  display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 22px;
+}
+
+/* ================= CREATE PAYMENT ================= */
+.create-payment-card {
+  background: white;
+  padding: 28px 32px;
+  border-radius: 20px;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+  margin-bottom: 40px;
+}
+
+/* TITLE */
+.create-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 22px;
+  color: #1e293b;
+}
+
+/* GRID */
+.create-payment-grid {
+  display: grid;
+  grid-template-columns: 2.2fr 1.4fr 1.4fr auto;
+  gap: 18px;
+  align-items: center;
+}
+
+/* INPUT + SELECT CHUNG */
+.create-payment-card select,
+.create-payment-card input {
+  height: 52px;                 /* 🔥 ÉP CAO BẰNG NHAU */
+  padding: 0 18px;
+  border-radius: 14px;
+  border: 1px solid #dbe3f0;
+  font-size: 15px;
+  outline: none;
+  background: white;
+  display: flex;
+  align-items: center;
+}
+
+/* FIX SELECT TEXT */
+.create-payment-card select {
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #64748b 50%),
+    linear-gradient(135deg, #64748b 50%, transparent 50%);
+  background-position:
+    calc(100% - 22px) calc(50% + 2px),
+    calc(100% - 16px) calc(50% + 2px);
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 42px;
+}
+
+.create-payment-card select:focus,
+.create-payment-card input:focus {
+  border-color: #1f6fff;
+  box-shadow: 0 0 0 2px rgba(31, 111, 255, 0.15);
+}
+
+/* BUTTON */
+.create-payment-btn {
+  height: 52px;                 /* 🔥 BẰNG INPUT */
+  padding: 0 28px;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(135deg, #1f6fff, #4fc3ff);
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.25s ease;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: -14px;
+}
+
+.create-payment-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 30px rgba(31, 111, 255, 0.35);
+}
+
+.create-payment-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
 }

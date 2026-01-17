@@ -20,3 +20,4 @@ class Talent(Base):
     bio = Column(Text)
     
     user = relationship("User", backref="talent")
+    

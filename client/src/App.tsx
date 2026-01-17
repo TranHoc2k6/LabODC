@@ -36,7 +36,7 @@ function RoleRedirect() {
 
   if (!user) return <Navigate to="/login" />;
 
-  if (user.role === "lab_admin") return <Navigate to="/admin/dashboard" />;
+  if (user.role === "admin") return <Navigate to="/admin/dashboard" />;
   if (user.role === "enterprise") return <Navigate to="/enterprise/dashboard" />;
   if (user.role === "mentor") return <Navigate to="/mentor/dashboard" />;
   return <Navigate to="/talent/dashboard" />;
@@ -59,7 +59,7 @@ function AppRoutes() {
         <Route
           path="/admin/dashboard"
           element={
-            <ProtectedRoute allowedRoles={['lab_admin']}>
+            <ProtectedRoute allowedRoles={['admin']}>
               <AdminDashboard />
             </ProtectedRoute>
           }
@@ -68,7 +68,7 @@ function AppRoutes() {
         <Route
           path="/admin/projects"
           element={
-            <ProtectedRoute allowedRoles={['lab_admin']}>
+            <ProtectedRoute allowedRoles={['admin']}>
               <AdminProjects />
             </ProtectedRoute>
           }
@@ -77,7 +77,7 @@ function AppRoutes() {
         <Route
           path="/admin/users"
           element={
-            <ProtectedRoute allowedRoles={['lab_admin']}>
+            <ProtectedRoute allowedRoles={['admin']}>
               <AdminUsers />
             </ProtectedRoute>
           }
@@ -86,7 +86,7 @@ function AppRoutes() {
         <Route
           path="/admin/payments"
           element={
-            <ProtectedRoute allowedRoles={['lab_admin']}>
+            <ProtectedRoute allowedRoles={['admin']}>
               <AdminPayments />
             </ProtectedRoute>
           }

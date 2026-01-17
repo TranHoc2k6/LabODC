@@ -16,24 +16,25 @@ const AdminDashboard = () => {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">LabODC – Admin Dashboard</h1>
+      <h1 className="page-title">LabODC – Admin Dashboard</h1>
 
-      <div className="grid grid-cols-3 gap-6 mb-10">
-        <div className="bg-white p-6 rounded-xl shadow">
-          <h3 className="text-gray-500">Users</h3>
-          <p className="text-3xl font-bold text-blue-600">{users.length}</p>
+      <div className="dashboard-grid">
+        <div className="dashboard-card">
+          <h3>Total Users</h3>
+          <div className="value">{users.length}</div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow">
-          <h3 className="text-gray-500">Pending Projects</h3>
-          <p className="text-3xl font-bold text-blue-600">{projects.length}</p>
+        <div className="dashboard-card">
+          <h3>Pending Projects</h3>
+          <div className="value">{projects.length}</div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow">
-          <h3 className="text-gray-500">Total Revenue</h3>
-          <p className="text-3xl font-bold text-blue-600">${totalRevenue}</p>
+        <div className="dashboard-card money">
+          <h3>Total Revenue</h3>
+          <div className="value">${totalRevenue}</div>
         </div>
       </div>
+
     </div>
   );
 };

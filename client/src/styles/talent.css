@@ -1,97 +1,238 @@
-.talent-sidebar {
-  width: 240px;
-  background: linear-gradient(180deg, #020617, #020617);
-  color: white;
-  padding: 20px;
+/* ================= GLOBAL ================= */
+.talent-layout {
+  display: flex;
+  height: 100vh;
+  background: linear-gradient(180deg, #f7faff, #f3f6fb);
+  font-family: "Playfair Display", "Merriweather", serif;
 }
 
+/* ================= SIDEBAR ================= */
 .talent-sidebar {
   width: 260px;
-  background: linear-gradient(180deg, #020617 0%, #020617 100%);
+  background: linear-gradient(180deg, #020c1b, #041c3c);
+  padding: 28px 20px;
   color: white;
-  padding: 24px 20px;
-  box-shadow: inset -1px 0 0 rgba(255,255,255,0.05);
+}
+
+.talent-logo {
+  font-size: 28px;
+  font-weight: bold;
+  color: #4fc3ff;
+  text-align: center;
+  margin-bottom: 40px;
 }
 
 .talent-menu a {
   display: block;
-  padding: 12px 16px;
-  margin-bottom: 12px;
-  color: #cbd5f5;
-  text-decoration: none;
-  border-radius: 12px;
-  font-weight: 500;
-}
-
-.talent-menu a.active,
-.talent-menu a:hover {
-  background: linear-gradient(90deg, #3b82f6, #38bdf8);
-  color: white;
-  box-shadow: 0 8px 24px rgba(56,189,248,0.35);
-}
-
-/* FORCE Talent layout giống Enterprise */
-
-.talent-layout {
-  display: flex !important;
-  min-height: 100vh !important;
-  width: 100%;
-  background: #f4f7fb;
-}
-
-/* Sidebar */
-.talent-sidebar {
-  width: 260px;
-  min-height: 100vh;
-  background: linear-gradient(180deg, #020617 0%, #020617 100%);
-  color: white;
-  padding: 24px 20px;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Logo */
-.talent-logo {
-  width: 100%;
-  text-align: center;
-  margin: 30px 0 40px 0;
-
-  font-size: 28px;
-  font-weight: 700;
-  color: #3fa9ff;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-
-/* Menu */
-.talent-menu {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.talent-menu a {
   padding: 14px 18px;
-  border-radius: 14px;
-  color: #cbd5f5;
-  font-weight: 500;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  color: white;
   text-decoration: none;
-  transition: all 0.25s ease;
+  font-size: 15px;
+  transition: 0.3s ease;
 }
 
 .talent-menu a.active,
 .talent-menu a:hover {
-  background: linear-gradient(90deg, #3b82f6, #38bdf8);
-  color: white;
-  box-shadow: 0 8px 24px rgba(56, 189, 248, 0.35);
+  background: linear-gradient(90deg, #2f80ff, #56ccf2);
 }
 
-/* Main content */
+/* ================= MAIN CONTENT ================= */
 .talent-main {
   flex: 1;
   padding: 40px;
-  background: #f4f7fb;
+  max-width: 1200px;
+  margin: 0 auto;        /* ⭐ DÒNG QUYẾT ĐỊNH */
+}
+
+/* ================= PAGE TITLE ================= */
+.talent-main h1 {
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #0f172a;
+  margin-bottom: 32px;
+}
+
+/* ================= DASHBOARD GRID ================= */
+.talent-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+/* ================= STAT CARD (GIỐNG ENTERPRISE) ================= */
+.talent-card {
+  background: white;
+  padding: 28px;
+  border-radius: 18px;
+  box-shadow: 0 15px 40px rgba(15, 23, 42, 0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+.talent-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #1f6fff, #4fc3ff);
+  opacity: 0.04;
+}
+
+/* title trong card */
+.talent-card h3 {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #1e293b;
+  margin-bottom: 24px;
+}
+
+/* số liệu */
+.talent-card h1 {
+  font-size: 34px;
+  font-weight: 700;
+  color: #2563eb;
+  line-height: 1.2;
+}
+
+/* earnings màu xanh lá */
+.talent-card:nth-child(3) h1 {
+  color: #10b981;
+}
+
+/* ================= PROFILE FORM ================= */
+.talent-profile-form {
+  width: 100%;
+  max-width: 680px;
+  background: white;
+  padding: 32px;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  padding-right: 62px;
+}
+
+
+.talent-profile-form input,
+.talent-profile-form textarea {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 16px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 15px;
+  outline: none;
+  font-family: inherit;
+  line-height: 1.6;
+}
+
+.talent-profile-form input:focus,
+.talent-profile-form textarea:focus {
+  border-color: #1f6fff;
+  box-shadow: 0 0 0 2px rgba(31, 111, 255, 0.15);
+}
+
+.talent-profile-form textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.talent-profile-form button {
+  padding: 12px 28px;
+  font-size: 16px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(90deg, #2f80ff, #56ccf2);
+  color: white;
+}
+
+/* ================= ADMIN PROJECTS – PAYMENT STYLE ================= */
+
+/* WRAPPER GIỐNG KHUNG PAYMENT */
+.project-wrapper {
+  background: white;
+  padding: 36px;
+  border-radius: 26px;
+  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.08);
+  max-width: 1200px;
+}
+
+/* GRID = DẠNG TABLE (1 CỘT) */
+.project-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+
+/* ===== PROJECT ROW ===== */
+.project-card {
+    display: inline-flex;
+    grid-template-columns: 3fr 1fr 1fr 1fr;
+    align-items: center;
+    padding: 37px 55px;
+    background: #f9fbff;
+    border-radius: 14px;
+    box-shadow: 0 10px 25px #0f172a0f;
+    margin-top: 29px;
+    justify-content: space-between;
+    margin-right: 98px;
+}
+
+.project-card:hover {
+  background: #f2f7ff;
+  transform: translateY(-2px);
+}
+
+/* ===== TEXT ===== */
+.project-card h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0b1c33;
+  margin: 0;
+}
+
+.project-card p {
+  font-size: 14px;
+  color: #475569;
+  margin: 0;
+}
+
+/* ===== STATUS (PENDING) ===== */
+.project-status {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: lowercase;
+
+  background: #e0edff;
+  color: #1f6fff;
+}
+
+/* ===== APPROVE BUTTON ===== */
+.project-card button {
+  padding: 10px 22px;
+  border-radius: 12px;
+  border: none;
+
+  background: linear-gradient(135deg, #1f6fff, #4fc3ff);
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+
+  box-shadow: 0 8px 22px rgba(31, 111, 255, 0.35);
+  transition: 0.25s ease;
+}
+
+.project-card button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 30px rgba(31, 111, 255, 0.5);
+}
+
+.project-card button:active {
+  transform: scale(0.96);
 }

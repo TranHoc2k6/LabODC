@@ -8,6 +8,7 @@ export const authAPI = {
     role: string;
   }) => api.post('/auth/register', data),
 
+
   login: async (data: { email: string; password: string }) => {
   const form = new URLSearchParams();
   form.append('username', data.email);

@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from app.core.database import get_db
 from app.schemas.payment_schema import PaymentCreate, PaymentResponse
 from app.services.payment import PaymentService
 from app.core.permissions import require_role
-from app.core.constants import ROLE_ENTERPRISE
+from app.core.constants import ROLE_ENTERPRISE, ROLE_ADMIN
 from app.models.enterprise import Enterprise
+from app.models.payment import Payment
 
 router = APIRouter(prefix="/payments", tags=["payments"])
 
@@ -34,3 +35,16 @@ def request_hybrid_support(
 
     payment = PaymentService.hybrid_support(db, project_id, enterprise.id)
     return {"message": "Hybrid support activated", "payment": payment}
+
+@router.get("/admin", response_model=list[PaymentResponse])
+def get_all_payments(
+    db: Session = Depends(get_db),
+    user=Depends(require_role(ROLE_ADMIN))
+):
+    payments = (
+        db.query(Payment)
+        .options(joinedload(Payment.project))
+        .order_by(Payment.created_at.desc())
+        .all()
+    )
+    return payments

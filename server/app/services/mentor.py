@@ -16,8 +16,15 @@ class MentorService:
         if user.talent or user.enterprise:
             raise HTTPException(400, "User already has another role")
 
-        mentor = Mentor(**data, user_id=user.id)
+        # ✅ FIX: loại bỏ additionalProp*
+        clean_data = {
+            k: v for k, v in data.items()
+            if hasattr(Mentor, k)
+        }
+
+        mentor = Mentor(**clean_data, user_id=user.id)
         db.add(mentor)
         db.commit()
         db.refresh(mentor)
         return mentor
+

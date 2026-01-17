@@ -23,6 +23,7 @@ class Payment(Base):
     lab_amount = Column(Float)
 
     is_hybrid = Column(Boolean, default=False)
+    project = relationship("Project", backref="payments")
 
 
 

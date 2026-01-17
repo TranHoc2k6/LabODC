@@ -5,7 +5,7 @@ export const getPendingProjects = async () => {
   return res.data;
 };
 
-export const validateProject = async (projectId: string) => {
+export const validateProject = async (projectId: number) => {
   const res = await axios.post(`/admin/projects/${projectId}/validate`);
   return res.data;
 };

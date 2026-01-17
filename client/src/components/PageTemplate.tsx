@@ -26,8 +26,11 @@ export default function PageTemplate() {
 
         <nav className={role === "talent" ? "talent-menu" : ""}>
           {/* ADMIN */}
-          {role === "lab_admin" && (
+          {role === "admin" && (
             <>
+              <NavLink to="/admin/dashboard" className="nav-item">
+                Dashboard
+              </NavLink>
               <NavLink to="/admin/projects" className="nav-item">
                 Projects
               </NavLink>
@@ -63,6 +66,24 @@ export default function PageTemplate() {
               <NavLink to="/talent/profile">Profile</NavLink>
             </>
           )}
+
+          {/* MENTOR */}
+          {role === "mentor" && (
+            <>
+              <NavLink to="/mentor/dashboard" className="nav-item">
+                Dashboard
+              </NavLink>
+
+              <NavLink to="/mentor/projects" className="nav-item">
+                Projects
+              </NavLink>
+
+              <NavLink to="/mentor/reports" className="nav-item">
+                Reports
+              </NavLink>
+            </>
+          )}
+
         </nav>
       </aside>
 

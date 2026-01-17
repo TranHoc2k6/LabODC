@@ -10,30 +10,34 @@ const AdminProjects = () => {
     setProjects(data);
   };
 
-  const handleValidate = async (id: string) => {
+  const handleValidate = async (id: number) => {
     await validateProject(id);
     loadProjects();
   };
+
 
   useEffect(() => {
     loadProjects();
   }, []);
 
-  return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Admin – Projects</h1>
+return (
+  <div className="admin-content">
+    <h1 className="page-title">Admin – Projects</h1>
 
-      <div className="flex gap-6">
-        {projects.map((project) => (
+    <div className="project-wrapper">
+      <div className="project-grid">
+        {projects.map(project => (
           <ProjectCard
-            key={project._id}
+            key={project.id}
             project={project}
             onValidate={handleValidate}
           />
         ))}
       </div>
     </div>
-  );
-};
+  </div>
+);
+
+}
 
 export default AdminProjects;

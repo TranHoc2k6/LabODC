@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getTalentProjects } from "../../api/talent";
+import { getTalentProjects, joinProject } from "../../api/talent";
 import "../../styles/talent.css";
 
 export default function TalentProjects() {
@@ -8,6 +8,15 @@ export default function TalentProjects() {
   useEffect(() => {
     getTalentProjects().then(setProjects);
   }, []);
+
+  const handleJoin = async (projectId: number) => {
+    try {
+      await joinProject(projectId);
+      alert("Joined project successfully");
+    } catch (err: any) {
+      alert(err.response?.data?.detail || "Join failed");
+    }
+  };
 
   return (
     <>
@@ -20,7 +29,9 @@ export default function TalentProjects() {
           <div key={p.id} className="project-card">
             <h3>{p.title}</h3>
             <p>{p.description}</p>
-            <button>Join</button>
+            <button onClick={() => handleJoin(p.id)}>
+              Join
+            </button>
           </div>
         ))}
       </div>

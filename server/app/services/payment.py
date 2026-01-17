@@ -5,6 +5,7 @@ from datetime import datetime
 from app.models.project import Project
 
 class PaymentService:
+
     @staticmethod
     def calculate_distribution(amount: float):
         return {
@@ -12,70 +13,81 @@ class PaymentService:
             "mentor": amount * MENTOR_PERCENT,
             "lab": amount * LAB_PERCENT
         }
-    
-@staticmethod
-def create_payment(db: Session, payment_data: dict, enterprise_id: int):
-    project = db.query(Project).filter(Project.id == payment_data["project_id"]).first()
 
-    if not project:
-        raise ValueError("Project not found")
+    @staticmethod
+    def create_payment(db: Session, payment_data: dict, enterprise_id: int):
+        project = db.query(Project).filter(Project.id == payment_data["project_id"]).first()
 
-    if project.enterprise_id != enterprise_id:
-        raise ValueError("You cannot pay for another company's project")
+        if not project:
+            raise ValueError("Project not found")
 
-    if project.status != "approved":
-        raise ValueError("Project not approved yet")
+        if project.enterprise_id != enterprise_id:
+            raise ValueError("You cannot pay for another company's project")
 
-    distribution = PaymentService.calculate_distribution(payment_data["amount"])
+        if project.status != "approved":
+            raise ValueError("Project not approved yet")
 
-    payment = Payment(
-        project_id=project.id,
-        enterprise_id=enterprise_id,
-        amount=payment_data["amount"],
-        payment_method=payment_data.get("payment_method", "PayOS"),
-        team_amount=distribution["team"],
-        mentor_amount=distribution["mentor"],
-        lab_amount=distribution["lab"]
-    )
-    db.add(payment)
-    db.commit()
-    db.refresh(payment)
-    return payment
-    
-@staticmethod
-def hybrid_support(db: Session, project_id: int, enterprise_id: int):
-    project = db.query(Project).filter(Project.id == project_id).first()
+        # ✅ CHECK EXISTING PAYMENT
+        existing = db.query(Payment).filter(
+            Payment.project_id == project.id,
+            Payment.is_hybrid == False
+        ).first()
 
-    if not project:
-        raise ValueError("Project not found")
+        if existing:
+            raise ValueError("This project already has a payment")
 
-    if project.enterprise_id != enterprise_id:
-        raise ValueError("You do not own this project")
+        distribution = PaymentService.calculate_distribution(payment_data["amount"])
 
-    if project.status != "approved":
-        raise ValueError("Project not approved")
+        payment = Payment(
+            project_id=project.id,
+            enterprise_id=enterprise_id,
+            amount=payment_data["amount"],
+            status="pending",
+            is_hybrid=False,
+            team_amount=distribution["team"],
+            mentor_amount=distribution["mentor"],
+            lab_amount=distribution["lab"]
+        )
 
-    # Prevent double hybrid funding
-    existing = db.query(Payment).filter(
-        Payment.project_id == project_id,
-        Payment.is_hybrid == True
-    ).first()
+        db.add(payment)
+        db.commit()
+        db.refresh(payment)
+        return payment
 
-    if existing:
-        raise ValueError("Hybrid support already activated")
 
-    payment = Payment(
-        project_id=project_id,
-        enterprise_id=None,
-        amount=project.total_budget,
-        status="hybrid_support",
-        is_hybrid=True,
-        hybrid_advanced_at=datetime.utcnow(),
-        team_amount=project.team_fund,
-        mentor_amount=project.mentor_fund,
-        lab_amount=project.lab_fund
-    )
+    @staticmethod
+    def hybrid_support(db: Session, project_id: int, enterprise_id: int):
+        project = db.query(Project).filter(Project.id == project_id).first()
 
-    db.add(payment)
-    db.commit()
-    return payment
+        if not project:
+            raise ValueError("Project not found")
+
+        if project.enterprise_id != enterprise_id:
+            raise ValueError("You do not own this project")
+
+        if project.status != "approved":
+            raise ValueError("Project not approved")
+
+        existing = db.query(Payment).filter(
+            Payment.project_id == project_id,
+            Payment.is_hybrid == True
+        ).first()
+
+        if existing:
+            raise ValueError("Hybrid support already activated")
+
+        payment = Payment(
+            project_id=project_id,
+            enterprise_id=None,
+            amount=project.total_budget,
+            status="hybrid_support",
+            is_hybrid=True,
+            hybrid_advanced_at=datetime.utcnow(),
+            team_amount=project.team_fund,
+            mentor_amount=project.mentor_fund,
+            lab_amount=project.lab_fund
+        )
+
+        db.add(payment)
+        db.commit()
+        return payment

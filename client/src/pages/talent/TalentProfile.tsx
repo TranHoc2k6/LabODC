@@ -18,32 +18,35 @@ export default function TalentProfile() {
     <>
       <h1>Talent Profile</h1>
 
-      <div className="talent-profile-form">
-        <input
-          placeholder="Full name"
-          value={form.full_name}
-          onChange={(e) =>
-            setForm({ ...form, full_name: e.target.value })
-          }
-        />
+      {/* container căn giữa content */}
+      <div className="talent-container">
+        <div className="talent-profile-form">
+          <input
+            placeholder="Full name"
+            value={form.full_name}
+            onChange={(e) =>
+              setForm({ ...form, full_name: e.target.value })
+            }
+          />
 
-        <input
-          placeholder="Skills"
-          value={form.skills}
-          onChange={(e) =>
-            setForm({ ...form, skills: e.target.value })
-          }
-        />
+          <input
+            placeholder="Skills"
+            value={form.skills}
+            onChange={(e) =>
+              setForm({ ...form, skills: e.target.value })
+            }
+          />
 
-        <textarea
-          placeholder="Bio"
-          value={form.bio}
-          onChange={(e) =>
-            setForm({ ...form, bio: e.target.value })
-          }
-        />
+          <textarea
+            placeholder="Bio"
+            value={form.bio}
+            onChange={(e) =>
+              setForm({ ...form, bio: e.target.value })
+            }
+          />
 
-        <button onClick={submit}>Save</button>
+          <button onClick={submit}>Save</button>
+        </div>
       </div>
     </>
   );

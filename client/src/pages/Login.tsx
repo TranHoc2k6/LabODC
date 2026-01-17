@@ -29,7 +29,7 @@ export default function Login() {
       // 🔥 lấy user từ localStorage (AuthContext đã lưu sẵn)
       const u = JSON.parse(localStorage.getItem("user")!);
 
-      if (u.role === "lab_admin") {
+      if (u.role === "admin") {
         navigate("/admin/dashboard");
       } else if (u.role === "enterprise") {
         navigate("/enterprise/dashboard");
@@ -81,7 +81,7 @@ export default function Login() {
               <option value="talent">Talent</option>
               <option value="mentor">Mentor</option>
               <option value="enterprise">Enterprise</option>
-              <option value="lab_admin">Lab Admin</option>
+              <option value="admin">Lab Admin</option>
             </select>
           </>
         )}
