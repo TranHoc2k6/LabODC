@@ -8,7 +8,6 @@ export default function Login() {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
   const [role, setRole] = useState("talent"); // chỉ dùng khi register
   const [error, setError] = useState("");
 
@@ -23,7 +22,7 @@ export default function Login() {
       if (isLogin) {
         await login(email, password);
       } else {
-        await register({ email, password, full_name: fullName, role });
+        await register({ email, password, role });
       }
 
       // 🔥 lấy user từ localStorage (AuthContext đã lưu sẵn)
@@ -46,7 +45,7 @@ export default function Login() {
 
   return (
     <div className="login-container">
-      <h1>{isLogin ? "LabODC Login" : "LabODC Register"}</h1>
+      <h1>{isLogin ? "LabODC" : "LabODC"}</h1>
 
       {error && <div className="error-message">{error}</div>}
 
@@ -69,19 +68,13 @@ export default function Login() {
 
         {!isLogin && (
           <>
-            <input
-              type="text"
-              placeholder="Full Name"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              required
-            />
+           
 
             <select value={role} onChange={(e) => setRole(e.target.value)}>
               <option value="talent">Talent</option>
               <option value="mentor">Mentor</option>
               <option value="enterprise">Enterprise</option>
-              <option value="admin">Lab Admin</option>
+              <option value="admin">Admin</option>
             </select>
           </>
         )}
