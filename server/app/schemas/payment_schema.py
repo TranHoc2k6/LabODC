@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional
 
+
 class PaymentCreate(BaseModel):
     project_id: int
     amount: float
@@ -27,7 +28,7 @@ class PaymentResponse(BaseModel):
     status: str
     created_at: Optional[datetime] = None
 
-    # 🔥 CÁI QUAN TRỌNG NHẤT
+    # ⭐ QUAN TRỌNG: để hiện tên project
     project: Optional[ProjectShort] = None
 
     class Config:

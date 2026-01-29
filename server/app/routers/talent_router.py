@@ -55,10 +55,9 @@ def join_project(
     db: Session = Depends(get_db),
     user = Depends(require_role(ROLE_TALENT))
 ):
-    if not user.talent:
+    talent = db.query(Talent).filter(Talent.user_id == user.id).first()
+    if not talent:
         raise HTTPException(status_code=400, detail="Talent profile missing")
-
-    talent = user.talent[0]
 
     project = db.query(Project).filter(Project.id == project_id).first()
     if not project or project.status != "approved":
@@ -72,12 +71,20 @@ def join_project(
     if existing:
         raise HTTPException(status_code=400, detail="Already joined this project")
 
+    # JOIN
     member = ProjectMember(
         project_id=project_id,
         talent_id=talent.id
     )
-
     db.add(member)
     db.commit()
 
-    return {"message": "Joined project successfully"}
+    # ✅ COUNT SAU KHI JOIN
+    joined_count = db.query(ProjectMember)\
+        .filter(ProjectMember.talent_id == talent.id)\
+        .count()
+
+    return {
+        "message": "Joined project successfully",
+        "joined_count": joined_count
+    }

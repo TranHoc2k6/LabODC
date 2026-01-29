@@ -11,12 +11,17 @@ export default function TalentProjects() {
 
   const handleJoin = async (projectId: number) => {
     try {
-      await joinProject(projectId);
+      const res = await joinProject(projectId);
+
+      // ⭐ DÒNG QUAN TRỌNG
+      localStorage.setItem("joinedCount", res.joined_count.toString());
+
       alert("Joined project successfully");
     } catch (err: any) {
       alert(err.response?.data?.detail || "Join failed");
     }
   };
+
 
   return (
     <>

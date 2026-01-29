@@ -4,6 +4,17 @@ import "../../styles/talent.css";
 
 export default function TalentDashboard() {
   const [projects, setProjects] = useState<any[]>([]);
+  const [joinedCount, setJoinedCount] = useState<number>(0);
+
+  useEffect(() => {
+    getTalentProjects().then(setProjects);
+
+    const savedCount = localStorage.getItem("joinedCount");
+    if (savedCount) {
+      setJoinedCount(Number(savedCount));
+    }
+  }, []);
+
 
   useEffect(() => {
     getTalentProjects().then(setProjects);
@@ -21,7 +32,7 @@ export default function TalentDashboard() {
 
         <div className="talent-card">
           <h3>Joined Projects</h3>
-          <h1>0</h1>
+          <h1>{joinedCount}</h1>
         </div>
 
         <div className="talent-card">
