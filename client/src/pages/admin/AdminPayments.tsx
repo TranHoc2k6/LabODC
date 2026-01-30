@@ -70,7 +70,9 @@ const AdminPayments = () => {
                 </td>
 
                 <td>
-                  <span className="role">{p.status}</span>
+                                    <span className="role">
+      {p.status === "pending" ? "completed" : p.status}
+    </span>
                 </td>
 
                 <td>

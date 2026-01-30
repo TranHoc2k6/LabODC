@@ -13,15 +13,21 @@ export default function TalentProjects() {
     try {
       const res = await joinProject(projectId);
 
-      // ⭐ DÒNG QUAN TRỌNG
+      // Lưu count từ backend response
       localStorage.setItem("joinedCount", res.joined_count.toString());
+      
+      // QUAN TRỌNG: Lưu project ID vào array
+      const joinedProjects = JSON.parse(localStorage.getItem("joinedProjects") || "[]");
+      if (!joinedProjects.includes(projectId)) {
+        joinedProjects.push(projectId);
+        localStorage.setItem("joinedProjects", JSON.stringify(joinedProjects));
+      }
 
-      alert("Joined project successfully");
+      alert("Joined project successfully!");
     } catch (err: any) {
       alert(err.response?.data?.detail || "Join failed");
     }
   };
-
 
   return (
     <>

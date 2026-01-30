@@ -42,10 +42,18 @@ def get_all_users(
     return db.query(User).all()
 
 
-# ✅ ADMIN PAYMENTS – có project + 70/20/10
 @router.get("/payments", response_model=List[PaymentResponse])
 def get_all_payments(
     db: Session = Depends(get_db),
     admin=Depends(require_role(ROLE_LAB_ADMIN))
 ):
-    return db.query(Payment).all()
+    payments = db.query(Payment).all()
+
+    # ✅ ADMIN VIEW = DUYỆT THANH TOÁN
+    for p in payments:
+        if p.status == "pending":
+            p.status = "paid"
+
+    db.commit()
+    return payments
+

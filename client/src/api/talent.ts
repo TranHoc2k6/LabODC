@@ -18,3 +18,14 @@ export const joinProject = async (projectId: number) => {
   const res = await axios.post(`/talent/projects/${projectId}/join`);
   return res.data;
 };
+
+export const getProjectTasks = async (projectId: number) => {
+  const res = await axios.get(`/talent/projects/${projectId}/tasks`);
+  return res.data;
+};
+
+// ✨ API MỚI: Lấy earnings của talent
+export const getTalentEarnings = async () => {
+  const res = await axios.get("/talent/earnings");
+  return res.data;
+};

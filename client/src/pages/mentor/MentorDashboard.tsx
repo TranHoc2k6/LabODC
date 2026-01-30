@@ -15,7 +15,7 @@ export default function MentorDashboard() {
   };
 
   const activeProjects = projects.filter(
-    (p) => p.status === 'ACTIVE'
+    (p) => p.status === 'approved'
   );
 
   return (

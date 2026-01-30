@@ -180,3 +180,193 @@
   border-radius: 18px;
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
 }
+
+/* =========================================================
+   MY PROJECTS – TABLE-LIKE UI (CSS ONLY, NO JSX CHANGE)
+========================================================= */
+
+.projects-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* mỗi project = 1 row */
+.project-card {
+  display: grid;
+  grid-template-columns: 3fr 2fr 1fr;
+  align-items: center;
+
+  background: #ffffff;
+  padding: 18px 24px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(15,23,42,0.06);
+
+  border-left: 4px solid #2563eb;
+  transition: 0.25s ease;
+}
+
+.project-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 40px rgba(15,23,42,0.1);
+}
+
+/* Project title */
+.project-card h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* Status */
+.project-card p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2563eb;
+  text-transform: capitalize;
+}
+
+/* Manage button */
+.project-card a {
+  justify-self: end;
+  text-decoration: none;
+
+  font-size: 14px;
+  font-weight: 700;
+  color: #2563eb;
+
+  padding: 8px 20px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.1);
+
+  transition: 0.25s ease;
+}
+
+.project-card a:hover {
+  background: linear-gradient(90deg, #2563eb, #38bdf8);
+  color: #ffffff;
+  box-shadow: 0 6px 18px rgba(37,99,235,0.35);
+}
+
+/* =========================================================
+   FIX: MY PROJECTS HORIZONTAL ROW (CSS ONLY)
+========================================================= */
+
+.projects-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+/* mỗi project = 1 hàng ngang */
+.project-card {
+  width: 100%;
+
+  display: grid;
+  grid-template-columns: 4fr 2fr 1fr;
+  align-items: center;
+
+  background: #ffffff;
+  padding: 20px 28px;
+  border-radius: 18px;
+
+  box-shadow: 0 15px 40px rgba(15,23,42,0.06);
+  border-left: 5px solid #2563eb;
+
+  transition: 0.25s ease;
+}
+
+.project-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 18px 50px rgba(15,23,42,0.1);
+}
+
+/* Title */
+.project-card h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* Status */
+.project-card p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2563eb;
+  justify-self: start;
+}
+
+/* Manage button */
+.project-card a {
+  justify-self: end;
+
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 700;
+  color: #2563eb;
+
+  padding: 10px 22px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.12);
+
+  transition: 0.25s ease;
+}
+
+.project-card a:hover {
+  background: linear-gradient(90deg, #2563eb, #38bdf8);
+  color: #ffffff;
+  box-shadow: 0 6px 18px rgba(37,99,235,0.35);
+}
+
+/* =========================================================
+   FORCE MY PROJECTS FULL WIDTH (ROOT FIX)
+========================================================= */
+
+/* ép container dashboard giãn ngang */
+.mentor-dashboard {
+  width: 100%;
+}
+
+/* ép my projects chiếm full content */
+.projects-list {
+  width: 100%;
+}
+
+/* ép card trải ngang */
+.project-card {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   HARD FIX – FORCE FULL WIDTH (NO JSX CHANGE)
+========================================================= */
+
+/* phá mọi max-width bên trong admin-content */
+.mentor-layout .admin-content * {
+  max-width: none !important;
+}
+
+/* ép dashboard chiếm full hàng */
+.mentor-dashboard {
+  width: 100% !important;
+  display: block !important;
+}
+
+/* ép my projects full chiều ngang */
+.projects-list {
+  width: 100% !important;
+  align-self: stretch !important;
+}
+
+/* ép từng card giãn ngang */
+.project-card {
+  width: 100% !important;
+  display: grid !important;
+  box-sizing: border-box;
+}

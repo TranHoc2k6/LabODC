@@ -75,6 +75,15 @@ export default function EnterprisePayments() {
     }
   };
 
+  /* ===== FORMAT TALENTS DISPLAY ===== */
+  const formatTalentsDisplay = (talents: any[]) => {
+    const count = talents?.length || 0;
+    if (count === 0) {
+      return "No talents";
+    }
+    return count === 1 ? "1 Talent" : `${count} Talents`;
+  };
+
   return (
     <>
       <h1 className="page-title">Payments</h1>
@@ -131,7 +140,6 @@ export default function EnterprisePayments() {
         </div>
       </div>
 
-
       {/* ========== PAYMENT LIST ========== */}
       <div className="table-container">
         <table className="admin-table">
@@ -156,17 +164,23 @@ export default function EnterprisePayments() {
             {payments.map((p) => (
               <tr key={p.paymentId}>
                 <td>{p.projectTitle}</td>
-                <td>${p.amount.toLocaleString()}</td>
-                <td>{p.status}</td>
+                <td>${p.amount?.toLocaleString()}</td>
                 <td>
-                  {p.talents?.length ? (
-                    p.talents.map((t: any) => (
-                      <div key={t.talentId}>
-                        Talent #{t.talentId} – ${t.amount} ({t.status})
-                      </div>
-                    ))
-                  ) : (
-                    <i>No talents</i>
+                  <span className={`status-badge status-${p.status?.toLowerCase()}`}>
+                    {p.status}
+                  </span>
+                </td>
+                <td>
+                  {formatTalentsDisplay(p.talents)}
+                  {/* Optional: Show talent details on hover or in a modal */}
+                  {p.talents?.length > 0 && (
+                    <div className="talent-tooltip">
+                      {p.talents.map((t: any) => (
+                        <div key={t.talentId} className="talent-item">
+                          Talent #{t.talentId} – ${t.amount}
+                        </div>
+                      ))}
+                    </div>
                   )}
                 </td>
               </tr>

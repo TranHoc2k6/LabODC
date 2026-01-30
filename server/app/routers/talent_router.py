@@ -5,6 +5,7 @@ from app.core.database import get_db
 from app.models.talent import Talent
 from app.models.project import Project, ProjectMember
 from app.models.user import User
+from app.models.payment import Payment
 from app.core.permissions import require_role
 from app.core.constants import ROLE_TALENT  
 from app.services.talent import TalentService
@@ -88,3 +89,45 @@ def join_project(
         "message": "Joined project successfully",
         "joined_count": joined_count
     }
+
+@router.get("/earnings")
+def get_talent_earnings(
+    db: Session = Depends(get_db),
+    user = Depends(require_role(ROLE_TALENT))
+):
+    """
+    Lấy tổng earnings của talent từ payments của các projects đã join
+    Trả về team_amount (70%) với status = 'paid'
+    """
+    try:
+        # Lấy tất cả payments với status = paid
+        payments = db.query(Payment).filter(
+            Payment.status == 'paid'
+        ).all()
+        
+        # Format response
+        result = {
+            "total_earnings": 0,
+            "payments": []
+        }
+        
+        # Tính tổng earnings
+        total = 0
+        for payment in payments:
+            total += float(payment.team_amount or 0)
+            result["payments"].append({
+                "project_id": payment.project_id,
+                "project_title": payment.project.title if payment.project else None,
+                "team_amount": float(payment.team_amount or 0),
+                "status": payment.status
+            })
+        
+        result["total_earnings"] = total
+        
+        return result
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error fetching earnings: {str(e)}"
+        )
