@@ -10,28 +10,19 @@ export default function TalentProfile() {
   });
 
   const submit = async () => {
-    try {
-      if (!form.full_name || !form.skills || !form.bio) {
-        alert("Please fill in all fields");
-        return;
-      }
-      
-      await createTalentProfile(form);
-      alert("Profile created successfully!");
-    } catch (error: any) {
-      alert(error.response?.data?.detail || "Failed to create profile");
-      console.error("Error:", error);
-    }
+    await createTalentProfile(form);
+    alert("Profile created");
   };
 
   return (
     <>
       <h1>Talent Profile</h1>
 
+      {/* container căn giữa content */}
       <div className="talent-container">
         <div className="talent-profile-form">
           <input
-            placeholder="Full Name"
+            placeholder="Full name"
             value={form.full_name}
             onChange={(e) =>
               setForm({ ...form, full_name: e.target.value })
@@ -39,7 +30,7 @@ export default function TalentProfile() {
           />
 
           <input
-            placeholder="Skills (e.g., React, Node.js, Python)"
+            placeholder="Skills"
             value={form.skills}
             onChange={(e) =>
               setForm({ ...form, skills: e.target.value })
@@ -47,7 +38,7 @@ export default function TalentProfile() {
           />
 
           <textarea
-            placeholder="Bio (Tell us about yourself)"
+            placeholder="Bio"
             value={form.bio}
             onChange={(e) =>
               setForm({ ...form, bio: e.target.value })
