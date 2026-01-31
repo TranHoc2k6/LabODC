@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import "../styles/login.css";
-import "../styles/theme.css";
 
 export default function Login() {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("talent"); // chỉ dùng khi register
+  const [fullName, setFullName] = useState("");
+  const [role, setRole] = useState("talent");
   const [error, setError] = useState("");
 
   const { login, register } = useAuth();
@@ -20,32 +20,42 @@ export default function Login() {
 
     try {
       if (isLogin) {
+        // LOGIN
         await login(email, password);
-      } else {
-        await register({ email, password, role });
-      }
 
-      // 🔥 lấy user từ localStorage (AuthContext đã lưu sẵn)
-      const u = JSON.parse(localStorage.getItem("user")!);
+        const u = JSON.parse(localStorage.getItem("user")!);
 
-      if (u.role === "admin") {
-        navigate("/admin/dashboard");
-      } else if (u.role === "enterprise") {
-        navigate("/enterprise/dashboard");
-      } else if (u.role === "mentor") {
-        navigate("/mentor/dashboard");
+        if (u.role === "admin") navigate("/admin/dashboard");
+        else if (u.role === "enterprise") navigate("/enterprise/dashboard");
+        else if (u.role === "mentor") navigate("/mentor/dashboard");
+        else navigate("/talent/dashboard");
+
       } else {
-        navigate("/talent/dashboard");
+        // REGISTER
+        await register({
+          email,
+          password,
+          full_name: fullName,
+          role,
+        });
+
+        alert("Đăng ký thành công! Vui lòng đăng nhập");
+        setIsLogin(true);
+        setPassword("");
       }
     } catch (err: any) {
-      setError(err.response?.data?.detail || "Authentication failed");
-      console.error("Auth error:", err);
+      const msg =
+        err.response?.data?.detail ||
+        err.response?.data?.msg ||
+        "Authentication failed";
+
+      setError(typeof msg === "string" ? msg : JSON.stringify(msg));
     }
   };
 
   return (
     <div className="login-container">
-      <h1>{isLogin ? "LabODC" : "LabODC"}</h1>
+      <h1>LabODC</h1>
 
       {error && <div className="error-message">{error}</div>}
 
@@ -68,7 +78,13 @@ export default function Login() {
 
         {!isLogin && (
           <>
-           
+            <input
+              type="text"
+              placeholder="Full name"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              required
+            />
 
             <select value={role} onChange={(e) => setRole(e.target.value)}>
               <option value="talent">Talent</option>

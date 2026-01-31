@@ -100,6 +100,14 @@ def get_talent_earnings(
     Trả về team_amount (70%) với status = 'paid'
     """
     try:
+        # ✨ LẤY TALENT VÀ ĐẾM JOINED PROJECTS
+        talent = db.query(Talent).filter(Talent.user_id == user.id).first()
+        joined_count = 0
+        if talent:
+            joined_count = db.query(ProjectMember).filter(
+                ProjectMember.talent_id == talent.id
+            ).count()
+        
         # Lấy tất cả payments với status = paid
         payments = db.query(Payment).filter(
             Payment.status == 'paid'
@@ -108,7 +116,8 @@ def get_talent_earnings(
         # Format response
         result = {
             "total_earnings": 0,
-            "payments": []
+            "payments": [],
+            "joined_count": joined_count  # ✨ THÊM FIELD NÀY
         }
         
         # Tính tổng earnings

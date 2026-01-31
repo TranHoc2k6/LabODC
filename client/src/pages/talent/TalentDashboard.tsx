@@ -17,37 +17,62 @@ export default function TalentDashboard() {
       const availableProjects = await getTalentProjects();
       setProjects(availableProjects);
 
-      // Lấy joined count
-      const savedCount = localStorage.getItem("joinedCount");
-      setJoinedCount(savedCount ? Number(savedCount) : 0);
-
-      // ✨ LẤY EARNINGS THỰC TỪ API
+      // ✨ LẤY EARNINGS VÀ JOINED COUNT TỪ API
       try {
         const earningsData = await getTalentEarnings();
         console.log("Earnings data:", earningsData);
         
-        // Lấy joined project IDs để filter
-        const joinedProjectIds = JSON.parse(
+        // ✨ DÙNG JOINED_COUNT TỪ BACKEND
+        if (earningsData.joined_count !== undefined) {
+          setJoinedCount(earningsData.joined_count);
+          localStorage.setItem("joinedCount", earningsData.joined_count.toString());
+        }
+        
+        // ✨ LẤY PROJECT IDS TỪ PAYMENTS VÀ SYNC VÀO LOCALSTORAGE
+        const projectIdsFromPayments = earningsData.payments.map((p: any) => p.project_id);
+        
+        // Lấy localStorage hiện tại
+        let joinedProjectIds = JSON.parse(
           localStorage.getItem("joinedProjects") || "[]"
         );
         
-        // Filter payments theo projects đã join
-        const myPayments = earningsData.payments.filter((p: any) =>
-          joinedProjectIds.includes(p.project_id)
-        );
+        // ✨ MERGE: Kết hợp localStorage + payments để không mất data
+        const allProjectIds = [...new Set([...joinedProjectIds, ...projectIdsFromPayments])];
         
-        // Tính tổng earnings từ projects đã join
-        const totalEarnings = myPayments.reduce(
-          (sum: number, p: any) => sum + (p.team_amount || 0),
-          0
-        );
+        // Lưu lại vào localStorage
+        if (allProjectIds.length > 0) {
+          localStorage.setItem("joinedProjects", JSON.stringify(allProjectIds));
+          joinedProjectIds = allProjectIds;
+        }
         
-        setEarnings(totalEarnings);
-        console.log("My earnings:", totalEarnings);
-        console.log("My payments:", myPayments);
+        console.log("Joined project IDs:", joinedProjectIds);
+        console.log("Joined count from backend:", earningsData.joined_count);
+        
+        // ✨ TÍNH EARNINGS
+        if (joinedProjectIds.length === 0) {
+          // Dùng tổng earnings từ API
+          setEarnings(earningsData.total_earnings || 0);
+          console.log("Using total earnings (no project IDs):", earningsData.total_earnings);
+        } else {
+          // Filter payments theo projects đã join
+          const myPayments = earningsData.payments.filter((p: any) =>
+            joinedProjectIds.includes(p.project_id)
+          );
+          
+          // Tính tổng earnings từ projects đã join
+          const totalEarnings = myPayments.reduce(
+            (sum: number, p: any) => sum + (p.team_amount || 0),
+            0
+          );
+          
+          setEarnings(totalEarnings);
+          console.log("My earnings (filtered):", totalEarnings);
+          console.log("My payments:", myPayments);
+        }
       } catch (error: any) {
         console.error("Error loading earnings:", error);
-        // Nếu API lỗi, earnings = 0
+        const savedCount = localStorage.getItem("joinedCount");
+        setJoinedCount(savedCount ? Number(savedCount) : 0);
         setEarnings(0);
       }
     } catch (error) {

@@ -33,14 +33,18 @@ import PageTemplate from "./components/PageTemplate";
 ========================= */
 function RoleRedirect() {
   const { user } = useAuth();
+  const token = localStorage.getItem("token");
 
-  if (!user) return <Navigate to="/login" />;
+  if (!token) return <Navigate to="/login" replace />;
 
-  if (user.role === "admin") return <Navigate to="/admin/dashboard" />;
-  if (user.role === "enterprise") return <Navigate to="/enterprise/dashboard" />;
-  if (user.role === "mentor") return <Navigate to="/mentor/dashboard" />;
-  return <Navigate to="/talent/dashboard" />;
+  if (!user) return null; // ⬅️ CHỜ load user
+
+  if (user.role === "admin") return <Navigate to="/admin/dashboard" replace />;
+  if (user.role === "enterprise") return <Navigate to="/enterprise/dashboard" replace />;
+  if (user.role === "mentor") return <Navigate to="/mentor/dashboard" replace />;
+  return <Navigate to="/talent/dashboard" replace />;
 }
+
 
 /* =========================
    Routes

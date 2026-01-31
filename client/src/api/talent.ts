@@ -1,11 +1,13 @@
 import axios from "./axios";
 
 export const createTalentProfile = async (data: {
-  full_name: string;
   skills: string;
   bio: string;
 }) => {
-  const res = await axios.post("/talent/profile", data);
+  const res = await axios.post("/talent/profile", {
+    skills: data.skills,
+    bio: data.bio
+  });
   return res.data;
 };
 

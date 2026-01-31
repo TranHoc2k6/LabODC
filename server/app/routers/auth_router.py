@@ -13,7 +13,12 @@ def register(user_data: UserRegister, db: Session = Depends(get_db)):
     try:
         user = AuthService.register_user(db, user_data)
         token = AuthService.create_token(user)
-        return {"access_token": token}
+
+        return {
+            "access_token": token,
+            "token_type": "bearer"
+        }
+
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 

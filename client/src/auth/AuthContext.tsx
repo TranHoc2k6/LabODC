@@ -1,6 +1,6 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import { authAPI } from '../api/auth';
-import { jwtDecode } from 'jwt-decode';
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { authAPI } from "../api/auth";
+import { jwtDecode } from "jwt-decode";
 
 interface User {
   id: number;
@@ -12,90 +12,88 @@ interface User {
 interface AuthContextType {
   user: User | null;
   token: string | null;
+  loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (data: any) => Promise<void>;
+  register: (data: {
+    email: string;
+    password: string;
+    full_name: string;
+    role: string;
+  }) => Promise<void>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
+  // load lại session
   useEffect(() => {
-    const storedToken = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('user');
-    if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
+    const t = localStorage.getItem("token");
+    const u = localStorage.getItem("user");
+
+    if (t && u) {
+      setToken(t);
+      setUser(JSON.parse(u));
     }
+
+    setLoading(false);
   }, []);
 
+  // LOGIN
   const login = async (email: string, password: string) => {
-    try {
-      const response = await authAPI.login({ email, password });
-      const { access_token } = response.data;
-      
-      // Decode JWT để lấy thông tin user
-      const decoded: any = jwtDecode(access_token);
-      const userData: User = {
-        id: decoded.id,
-        email: decoded.sub,
-        full_name: decoded.full_name || email,
-        role: decoded.role
-      };
-      
-      localStorage.setItem('token', access_token);
-      localStorage.setItem('user', JSON.stringify(userData));
-      setToken(access_token);
-      setUser(userData);
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
-    }
+    const res = await authAPI.login({ email, password });
+    const { access_token } = res.data;
+
+    const decoded: any = jwtDecode(access_token);
+
+    const userData: User = {
+      id: decoded.id,
+      email: decoded.sub,
+      full_name: decoded.full_name,
+      role: decoded.role,
+    };
+
+    localStorage.setItem("token", access_token);
+    localStorage.setItem("user", JSON.stringify(userData));
+
+    setToken(access_token);
+    setUser(userData);
   };
 
-  const register = async (data: any) => {
-    try {
-      const response = await authAPI.register(data);
-      const { access_token } = response.data;
-      
-      const userData: User = {
-        id: 1,
-        email: data.email,
-        full_name: data.full_name,
-        role: data.role
-      };
-      
-      localStorage.setItem('token', access_token);
-      localStorage.setItem('user', JSON.stringify(userData));
-      setToken(access_token);
-      setUser(userData);
-    } catch (error) {
-      console.error('Register error:', error);
-      throw error;
-    }
+  // REGISTER (❗ KHÔNG auto login)
+  const register = async (data: {
+    email: string;
+    password: string;
+    full_name: string;
+    role: string;
+  }) => {
+    await authAPI.register(data);
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setToken(null);
+    localStorage.clear();
     setUser(null);
-    window.location.href = '/login';
+    setToken(null);
+    window.location.href = "/login";
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, register, logout }}>
+    <AuthContext.Provider
+      value={{ user, token, loading, login, register, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error('useAuth must be used within AuthProvider');
-  return context;
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
+  return ctx;
 };
-

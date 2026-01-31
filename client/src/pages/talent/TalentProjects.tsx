@@ -13,10 +13,10 @@ export default function TalentProjects() {
     try {
       const res = await joinProject(projectId);
 
-      // Lưu count từ backend response
+      // ✅ LƯU JOINED COUNT VÀO LOCALSTORAGE
       localStorage.setItem("joinedCount", res.joined_count.toString());
       
-      // QUAN TRỌNG: Lưu project ID vào array
+      // ✅ LƯU PROJECT ID VÀO ARRAY
       const joinedProjects = JSON.parse(localStorage.getItem("joinedProjects") || "[]");
       if (!joinedProjects.includes(projectId)) {
         joinedProjects.push(projectId);
@@ -24,6 +24,9 @@ export default function TalentProjects() {
       }
 
       alert("Joined project successfully!");
+      
+      // Reload projects để cập nhật UI
+      getTalentProjects().then(setProjects);
     } catch (err: any) {
       alert(err.response?.data?.detail || "Join failed");
     }

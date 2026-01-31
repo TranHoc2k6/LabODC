@@ -5,6 +5,8 @@ from app.core.constants import ROLE_ENTERPRISE
 from sqlalchemy import func
 from app.models.project import Project, ProjectMember
 from app.models.payment import Payment
+from app.models.talent import Talent
+from app.models.user import User
 
 class EnterpriseService:
 
@@ -44,7 +46,7 @@ class EnterpriseDashboardService:
             Project.enterprise_id == enterprise.id
         ).count()
 
-        # ✨ Total spent - tính tổng từ team + mentor + lab
+        # Total spent - tính tổng từ team + mentor + lab
         total_spent = db.query(
             func.coalesce(
                 func.sum(
@@ -92,7 +94,32 @@ class EnterpriseDashboardService:
         for p in payments:
             project = p.project
 
-            # Tính total amount từ 3 columns
+            # ✨ LẤY TALENTS TỪ PROJECTMEMBER
+            talents = []
+            if project:
+                # Lấy tất cả talents đã join vào project này
+                project_members = db.query(ProjectMember).filter(
+                    ProjectMember.project_id == project.id
+                ).all()
+                
+                # Tính payment cho mỗi talent (chia đều team_amount)
+                if project_members and p.team_amount:
+                    amount_per_talent = float(p.team_amount) / len(project_members)
+                    
+                    for member in project_members:
+                        talent = db.query(Talent).filter(
+                            Talent.id == member.talent_id
+                        ).first()
+                        
+                        if talent:
+                            talents.append({
+                                "talentId": talent.id,
+                                "talentName": talent.user.full_name if talent.user else f"Talent {talent.id}",
+                                "amount": round(amount_per_talent, 2),
+                                "status": p.status
+                            })
+
+            # Tính total amount
             total = (
                 (p.team_amount or 0) + 
                 (p.mentor_amount or 0) + 
@@ -108,6 +135,7 @@ class EnterpriseDashboardService:
                 "mentorAmount": float(p.mentor_amount or 0),
                 "labAmount": float(p.lab_amount or 0),
                 "status": p.status,
+                "talents": talents  # ✨ THÊM TALENTS
             })
 
         return result
